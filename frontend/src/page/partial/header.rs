@@ -1,12 +1,12 @@
  use crate::{
     generated::css_classes::C,
     image_src, Page, ScrollHistory, Urls,
-    Visibility::{self, *},
 };
 use seed::{prelude::*, *};
 use crate::page::home::Model;
+use crate::page::common::visibility::Visibility;
 
-#[derive(Debug)]
+ #[derive(Debug)]
 pub enum Msg {
     UrlChanged(subs::UrlChanged),
     ScrollToTop,
@@ -20,22 +20,22 @@ fn header_visibility(
     menu_visibility: Visibility,
     scroll_history: &ScrollHistory,
 ) -> Visibility {
-    let menu_is_visible = menu_visibility == Visible;
+    let menu_is_visible = menu_visibility == Visibility::Visible;
     // You can go higher on the mobile phones.
     let at_the_top_or_higher = *scroll_history.back().unwrap_or(&0) <= 0;
     let scrolling_up = scroll_history.front() >= scroll_history.back();
 
     if menu_is_visible || at_the_top_or_higher || scrolling_up {
-        return Visible;
+        return Visibility::Visible;
     }
-    Hidden
+    Visibility::Hidden
 }
 
 #[allow(clippy::too_many_lines)]
 pub fn view(model: &Model) -> Vec<Node<Msg>> {
     let show_header =
         header_visibility(model.menu_visibility, &model.scroll_history)
-            == Visible;
+            == Visibility::Visible;
     nodes![
         // Header background and line container
         IF!(show_header =>
@@ -71,7 +71,7 @@ pub fn view(model: &Model) -> Vec<Node<Msg>> {
             ]
         ),
         // Menu
-        IF!(model.menu_visibility == Visible =>
+        IF!(model.menu_visibility == Visibility::Visible =>
             div![
                 C![
                     C.fixed,
@@ -299,7 +299,7 @@ pub fn view(model: &Model) -> Vec<Node<Msg>> {
                                 }
                             } else {
                                 attrs! {
-                                    At::Src => if model.menu_visibility == Visible {
+                                    At::Src => if model.menu_visibility == Visibility::Visible {
                                         image_src("cross.svg")
                                     } else {
                                         image_src("hamburger.svg")

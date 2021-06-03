@@ -1,5 +1,8 @@
-use crate::{generated::css_classes::C, Urls, Page, ScrollHistory, Visibility, Skill, is_in_prerendering};
+use crate::generated::css_classes::C;
+use crate::{Urls, Page, ScrollHistory, is_in_prerendering};
 use seed::{prelude::*, *};
+use crate::page::common::visibility::Visibility;
+use crate::page::common::backend_structs::Skill;
 
 #[derive(Debug)]
 pub enum Msg {

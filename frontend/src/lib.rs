@@ -9,15 +9,13 @@
 
 extern crate console_error_panic_hook;
 
+use fixed_vec_deque::FixedVecDeque;
+use seed::{*, prelude::*};
+
+use generated::css_classes::C;
+
 mod generated;
 mod page;
-mod backend_structs;
-
-use backend_structs::*;
-
-use fixed_vec_deque::FixedVecDeque;
-use generated::css_classes::C;
-use seed::{prelude::*, *};
 
 #[macro_use]
 extern crate serde_derive;
@@ -31,28 +29,11 @@ const IMAGES_PATH: &str = "static/images";
 
 const ABOUT: &str = "about";
 
-
-
 fn is_in_prerendering() -> bool {
     let user_agent =
         window().navigator().user_agent().expect("cannot get user agent");
 
     user_agent == USER_AGENT_FOR_PRERENDERING
-}
-
-#[derive(Clone, Copy, Eq, PartialEq)]
-pub enum Visibility {
-    Visible,
-    Hidden,
-}
-
-impl Visibility {
-    pub fn toggle(&mut self) {
-        *self = match self {
-            Self::Visible => Self::Hidden,
-            Self::Hidden => Self::Visible,
-        }
-    }
 }
 
 // We need at least 3 last values to detect scroll direction,
