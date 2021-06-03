@@ -12,7 +12,6 @@ pub enum Msg {
     Received(Vec<Skill>),
 }
 
-
 pub struct Model {
     pub base_url: Url,
     pub page: Page,

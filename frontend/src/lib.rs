@@ -11,6 +11,9 @@ extern crate console_error_panic_hook;
 
 mod generated;
 mod page;
+mod backend_structs;
+
+use backend_structs::*;
 
 use fixed_vec_deque::FixedVecDeque;
 use generated::css_classes::C;
@@ -28,11 +31,7 @@ const IMAGES_PATH: &str = "static/images";
 
 const ABOUT: &str = "about";
 
-#[derive(Clone, Debug, Deserialize)]
-pub struct Skill {
-    pub id: i32,
-    pub skill: String,
-}
+
 
 fn is_in_prerendering() -> bool {
     let user_agent =
