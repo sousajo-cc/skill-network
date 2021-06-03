@@ -21,7 +21,6 @@ After a while, the application will be available on localhost:8080
 ### Dependencies
 
 Install usual rust stuff (cargo, rustc nightly).
-Install libsqlite3-dev.
 
 ```
 cargo install diesel_cli --no-default-features --features "sqlite-bundled"

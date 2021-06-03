@@ -1,4 +1,4 @@
-#![deny(warnings)]
+//#![deny(warnings)]
 #![allow(
     clippy::used_underscore_binding,
     clippy::non_ascii_literal,
@@ -15,8 +15,6 @@ mod page;
 use fixed_vec_deque::FixedVecDeque;
 use generated::css_classes::C;
 use seed::{prelude::*, *};
-use Visibility::*;
-use crate::Model::Home;
 
 #[macro_use]
 extern crate serde_derive;
@@ -30,17 +28,11 @@ const IMAGES_PATH: &str = "static/images";
 
 const ABOUT: &str = "about";
 
-// ------ ------
-//     Init
-// ------ ------
-
 #[derive(Clone, Debug, Deserialize)]
 pub struct Skill {
     pub id: i32,
     pub skill: String,
 }
-
-
 
 fn is_in_prerendering() -> bool {
     let user_agent =
@@ -48,10 +40,6 @@ fn is_in_prerendering() -> bool {
 
     user_agent == USER_AGENT_FOR_PRERENDERING
 }
-
-// ------ ------
-//     Model
-// ------ ------
 
 #[derive(Clone, Copy, Eq, PartialEq)]
 pub enum Visibility {
@@ -62,8 +50,8 @@ pub enum Visibility {
 impl Visibility {
     pub fn toggle(&mut self) {
         *self = match self {
-            Visible => Hidden,
-            Hidden => Visible,
+            Self::Visible => Self::Hidden,
+            Self::Hidden => Self::Visible,
         }
     }
 }
@@ -72,18 +60,15 @@ impl Visibility {
 // because neighboring ones are sometimes equal.
 type ScrollHistory = FixedVecDeque<[i32; 3]>;
 
-//enum
-
 pub enum Model {
     Home(page::home::Model),
 }
 
 fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
-    Home(page::home::init(url, &mut orders.proxy(Msg::HomeMsg)))
+    let orders = orders.proxy(Msg::Home);
+    let page = page::home::init(url, orders);
+    Model::Home(page)
 }
-
-
-// ------ Page ------
 
 #[derive(Clone, Copy, Eq, PartialEq)]
 pub enum Page {
@@ -104,10 +89,6 @@ impl Page {
     }
 }
 
-// ------ ------
-//     Urls
-// ------ ------
-
 struct_urls!();
 impl<'a> Urls<'a> {
     pub fn home(self) -> Url {
@@ -118,14 +99,10 @@ impl<'a> Urls<'a> {
     }
 }
 
-// ------ ------
-//    Update
-// ------ ------
-
 #[derive(Debug)]
 pub enum Msg {
-    HomeMsg(page::home::Msg),
-    AboutMsg(page::about::Msg),
+    Home(page::home::Msg),
+    About(page::about::Msg),
     NotFound(page::not_found::Msg),
     Header(page::partial::header::Msg),
     Footer(page::partial::footer::Msg),
@@ -133,23 +110,11 @@ pub enum Msg {
 
 pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
     match (model, msg) {
-        (Model::Home(inner_model), Msg::HomeMsg(inner_msg)) =>
-            page::home::update(&mut orders.proxy(Msg::HomeMsg), inner_model, inner_msg),
+        (Model::Home(inner_model), Msg::Home(inner_msg)) =>
+            page::home::update(&mut orders.proxy(Msg::Home), inner_model, inner_msg),
         _ => unimplemented!()
     }
 }
-
-
-// ------ ------
-//     View
-// ------ ------
-
-// Notes:
-// - \u{00A0} is the non-breaking space
-//   - https://codepoints.net/U+00A0
-//
-// - "▶\u{fe0e}" - \u{fe0e} is the variation selector, it prevents ▶ to change to emoji in some browsers
-//   - https://codepoints.net/U+FE0E
 
 pub fn view(model: &Model) -> impl IntoNodes<Msg> {
     match model {
@@ -162,8 +127,8 @@ pub fn view(model: &Model) -> impl IntoNodes<Msg> {
                 C.flex_col,
             ],
             match inner_model.page {
-                Page::Home => page::home::view(&inner_model).map_msg(|msg| Msg::HomeMsg(msg)),
-                Page::About => page::about::view().map_msg(|msg| Msg::AboutMsg(msg)),
+                Page::Home => page::home::view(&inner_model).map_msg(|msg| Msg::Home(msg)),
+                Page::About => page::about::view().map_msg(|msg| Msg::About(msg)),
                 Page::NotFound => page::not_found::view().map_msg(|msg| Msg::NotFound(msg)),
             },
             page::partial::header::view(inner_model).map_msg(|msg| Msg::Header(msg)),
@@ -179,10 +144,6 @@ pub fn image_src(image: &str) -> String {
 pub fn asset_path(asset: &str) -> String {
     format!("{}/{}", STATIC_PATH, asset)
 }
-
-// ------ ------
-//     Start
-// ------ ------
 
 #[wasm_bindgen(start)]
 pub fn run() {
