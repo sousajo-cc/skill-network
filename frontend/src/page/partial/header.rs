@@ -1,8 +1,5 @@
-use crate::generated::css_classes::C;
-use seed::{prelude::*, *};
 use crate::page::*;
 use crate::page::home::Model;
-use crate::page::common::visibility::Visibility;
 
  #[derive(Debug)]
 pub enum Msg {

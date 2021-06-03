@@ -1,5 +1,3 @@
-use crate::generated::css_classes::C;
-use seed::{prelude::*, *};
 use crate::page::*;
 
 #[derive(Debug)]

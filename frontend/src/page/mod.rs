@@ -1,12 +1,14 @@
-use seed::*;
-use fixed_vec_deque::FixedVecDeque;
-
 pub mod common;
 
 pub mod home;
 pub mod about;
 pub mod not_found;
 pub mod partial;
+
+use seed::{prelude::*, *};
+use crate::generated::css_classes::C;
+use common::*;
+use fixed_vec_deque::FixedVecDeque;
 
 const TITLE_SUFFIX: &str = "Company";
 const ABOUT: &str = "about";
