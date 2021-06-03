@@ -27,10 +27,10 @@ RUN rustup target add wasm32-unknown-unknown
 ADD . ./
 
 RUN yarn install --pure-lockfile
-RUN yarn global add webpack
-RUN yarn global add serve
-RUN yarn global add webpack-cli
-RUN yarn global add webpack-dev-server
+RUN yarn add webpack
+RUN yarn add serve
+RUN yarn add webpack-cli
+RUN yarn add webpack-dev-server
 
 EXPOSE 8080
 
