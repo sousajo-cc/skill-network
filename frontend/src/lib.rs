@@ -9,7 +9,6 @@
 
 extern crate console_error_panic_hook;
 
-use fixed_vec_deque::FixedVecDeque;
 use seed::{*, prelude::*};
 
 use generated::css_classes::C;
@@ -20,24 +19,6 @@ mod page;
 #[macro_use]
 extern crate serde_derive;
 
-// Page title
-const MAIL_TO_US: &str = "mailto:company@company.com";
-const USER_AGENT_FOR_PRERENDERING: &str = "ReactSnap";
-const STATIC_PATH: &str = "static";
-const IMAGES_PATH: &str = "static/images";
-
-
-fn is_in_prerendering() -> bool {
-    let user_agent =
-        window().navigator().user_agent().expect("cannot get user agent");
-
-    user_agent == USER_AGENT_FOR_PRERENDERING
-}
-
-// We need at least 3 last values to detect scroll direction,
-// because neighboring ones are sometimes equal.
-type ScrollHistory = FixedVecDeque<[i32; 3]>;
-
 pub enum Model {
     Home(page::home::Model),
 }
@@ -46,17 +27,6 @@ fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
     let orders = orders.proxy(Msg::Home);
     let page = page::home::init(url, orders);
     Model::Home(page)
-}
-
-struct_urls!();
-impl<'a> Urls<'a> {
-    pub fn home(self) -> Url {
-        self.base_url()
-    }
-    pub fn about(self) -> Url {
-        const ABOUT: &str = "about"; //TODO: remove. use the one on page/mod instead
-        self.base_url().add_path_part(ABOUT)
-    }
 }
 
 #[derive(Debug)]
@@ -97,14 +67,6 @@ pub fn view(model: &Model) -> impl IntoNodes<Msg> {
             page::partial::footer::view().map_msg(|msg| Msg::Footer(msg)),
         ]
     }
-}
-
-pub fn image_src(image: &str) -> String {
-    format!("{}/{}", IMAGES_PATH, image)
-}
-
-pub fn asset_path(asset: &str) -> String {
-    format!("{}/{}", STATIC_PATH, asset)
 }
 
 #[wasm_bindgen(start)]

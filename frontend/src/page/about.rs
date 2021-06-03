@@ -1,8 +1,6 @@
-use crate::{
-    generated::css_classes::C,
-    image_src,
-};
+use crate::generated::css_classes::C;
 use seed::{prelude::*, *};
+use crate::page::*;
 
 #[derive(Debug)]
 pub enum Msg {

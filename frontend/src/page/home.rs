@@ -1,7 +1,6 @@
 use crate::generated::css_classes::C;
-use crate::{Urls, ScrollHistory, is_in_prerendering};
 use seed::{prelude::*, *};
-use crate::page::Page;
+use crate::page::*;
 use crate::page::common::visibility::Visibility;
 use crate::page::common::backend_structs::Skill;
 
