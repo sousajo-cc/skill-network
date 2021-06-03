@@ -1,8 +1,9 @@
  use crate::{
     generated::css_classes::C,
-    image_src, Page, ScrollHistory, Urls,
+    image_src, ScrollHistory, Urls,
 };
 use seed::{prelude::*, *};
+use crate::page::Page;
 use crate::page::home::Model;
 use crate::page::common::visibility::Visibility;
 

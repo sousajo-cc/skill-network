@@ -21,13 +21,11 @@ mod page;
 extern crate serde_derive;
 
 // Page title
-const TITLE_SUFFIX: &str = "Company";
 const MAIL_TO_US: &str = "mailto:company@company.com";
 const USER_AGENT_FOR_PRERENDERING: &str = "ReactSnap";
 const STATIC_PATH: &str = "static";
 const IMAGES_PATH: &str = "static/images";
 
-const ABOUT: &str = "about";
 
 fn is_in_prerendering() -> bool {
     let user_agent =
@@ -50,31 +48,13 @@ fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
     Model::Home(page)
 }
 
-#[derive(Clone, Copy, Eq, PartialEq)]
-pub enum Page {
-    Home,
-    About,
-    NotFound,
-}
-
-impl Page {
-    pub fn init(mut url: Url) -> Self {
-        let (page, title) = match url.remaining_path_parts().as_slice() {
-            [] => (Self::Home, TITLE_SUFFIX.to_owned()),
-            [ABOUT] => (Self::About, format!("About - {}", TITLE_SUFFIX)),
-            _ => (Self::NotFound, format!("404 - {}", TITLE_SUFFIX)),
-        };
-        document().set_title(&title);
-        page
-    }
-}
-
 struct_urls!();
 impl<'a> Urls<'a> {
     pub fn home(self) -> Url {
         self.base_url()
     }
     pub fn about(self) -> Url {
+        const ABOUT: &str = "about"; //TODO: remove. use the one on page/mod instead
         self.base_url().add_path_part(ABOUT)
     }
 }
@@ -97,6 +77,8 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
 }
 
 pub fn view(model: &Model) -> impl IntoNodes<Msg> {
+    use page::Page;
+
     match model {
         Model::Home(inner_model) =>
             div![
