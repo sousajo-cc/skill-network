@@ -1,0 +1,99 @@
+use crate::database::models::tables::employee_skill::*;
+use crate::database::models::skill::Skill;
+use crate::database::models::employee::Employee;
+use crate::result::BackendError;
+use diesel::{RunQueryDsl, SqliteConnection};
+use diesel::prelude::*;
+
+#[derive(Queryable, Serialize, Identifiable, Associations, Clone, Debug)]
+#[belongs_to(Employee, foreign_key="employee_number")]
+#[belongs_to(Skill)]
+pub struct EmployeesSkill {
+    pub id: i32,
+    pub employee_number: String,
+    pub skill_id: i32,
+}
+
+impl EmployeesSkill {
+
+    pub fn list(conn: &SqliteConnection) -> QueryResult<Vec<EmployeesSkill>> {
+        employees_skills_table.load::<EmployeesSkill>(conn)
+    }
+
+    pub fn find(conn: &SqliteConnection, employee_skill_id: i32) -> QueryResult<EmployeesSkill>  {
+        employees_skills_table
+            .filter(id.eq(employee_skill_id))
+            .get_result::<EmployeesSkill>(conn)
+    }
+
+    pub fn filter_by_employee(conn: &SqliteConnection, employee: Employee) -> QueryResult<Vec<EmployeesSkill>> {
+        EmployeesSkill::belonging_to(&employee)
+            .load::<EmployeesSkill>(conn)
+    }
+
+    pub fn filter_by_employees(conn: &SqliteConnection, employees: Vec<Employee>) -> QueryResult<Vec<EmployeesSkill>> {
+        EmployeesSkill::belonging_to(&employees)
+            .load::<EmployeesSkill>(conn)
+    }
+
+    pub fn filter_by_skill(conn: &SqliteConnection, skill: Skill) -> QueryResult<Vec<EmployeesSkill>> {
+        EmployeesSkill::belonging_to(&skill)
+            .load::<EmployeesSkill>(conn)
+    }
+
+    pub fn filter_by_skills(conn: &SqliteConnection, skills: Vec<Skill>) -> QueryResult<Vec<EmployeesSkill>> {
+        EmployeesSkill::belonging_to(&skills)
+            .load::<EmployeesSkill>(conn)
+    }
+
+    pub fn filter(conn: &SqliteConnection, employees: Vec<Employee>, skills: Vec<Skill>) -> QueryResult<Vec<EmployeesSkill>> {
+        let skills: Vec<i32> = skills
+            .iter()
+            .map(|skill| skill.id)
+            .collect();
+        EmployeesSkill::belonging_to(&employees)
+            .filter(skill_id.eq_any(skills))
+            .load::<EmployeesSkill>(conn)
+    }
+}
+
+#[derive(Insertable, Deserialize, Clone)]
+#[table_name="employees_skills"]
+pub struct NewEmployeesSkill {
+    pub employee_number: String,
+    pub skill_id: i32,
+}
+
+impl NewEmployeesSkill {
+    pub fn insert(self, conn: &SqliteConnection) -> QueryResult<usize> {
+        diesel::insert_into(employees_skills_table)
+            .values(self)
+            .execute(conn)
+    }
+
+    pub fn insert_batch(conn: &SqliteConnection, values: Vec::<NewEmployeesSkill>) -> QueryResult<usize> {
+        diesel::insert_into(employees_skills_table)
+            .values(values)
+            .execute(conn)
+    }
+}
+
+pub trait ListSkills {
+    fn list_skills(self) -> Result<Vec<Skill>, BackendError>;
+}
+
+impl ListSkills for Employee {
+    fn list_skills(self) -> Result<Vec<Skill>, BackendError> {
+        unimplemented!();
+    }
+}
+
+pub trait ListEmployees {
+    fn list_employees(self) -> Result<Vec<Employee>, BackendError>;
+}
+
+impl ListEmployees for Skill {
+    fn list_employees(self) -> Result<Vec<Employee>, BackendError> {
+        unimplemented!();
+    }
+}

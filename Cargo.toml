@@ -1,0 +1,8 @@
+[package]
+name = "skill-network"
+version = "0.1.0"
+authors = ["sousajo"]
+edition = "2018"
+
+[workspace]
+members = ["backend", "frontend"]
