@@ -2,6 +2,7 @@ pub mod common;
 
 pub mod home;
 pub mod about;
+pub mod skill;
 pub mod not_found;
 pub mod partial;
 
@@ -21,6 +22,7 @@ const MAIL_TO_US: &str = "mailto:company@company.com";
 pub enum Page {
     Home,
     About,
+    Skill,
     NotFound,
 }
 
@@ -29,6 +31,7 @@ impl Page {
         let (page, title) = match url.remaining_path_parts().as_slice() {
             [] => (Self::Home, TITLE_SUFFIX.to_owned()),
             [ABOUT] => (Self::About, format!("About - {}", TITLE_SUFFIX)),
+            ["skill", id] => (Self::Skill, id.to_string()),
             _ => (Self::NotFound, format!("404 - {}", TITLE_SUFFIX)),
         };
         document().set_title(&title);

@@ -25,6 +25,7 @@ extern crate serde_derive;
 pub enum Msg {
     Home(page::home::Msg),
     About(page::about::Msg),
+    Skill(page::skill::Msg),
     NotFound(page::not_found::Msg),
     Header(page::partial::header::Msg),
     Footer(page::partial::footer::Msg),
@@ -39,6 +40,8 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
     match msg {
         Msg::Home(inner_msg) =>
             page::home::update(&mut orders.proxy(Msg::Home), model, inner_msg),
+        Msg::Skill(inner_msg) =>
+            page::skill::update(&mut orders.proxy(Msg::Skill), model, inner_msg),
         _ => unimplemented!()
     }
 }
@@ -56,6 +59,7 @@ pub fn view(model: &Model) -> impl IntoNodes<Msg> {
         match model.page {
             Page::Home => page::home::view(model).map_msg(Msg::Home),
             Page::About => page::about::view().map_msg(Msg::About),
+            Page::Skill => page::skill::view(model).map_msg(Msg::Skill),
             Page::NotFound => page::not_found::view().map_msg(Msg::NotFound),
         },
         page::partial::header::view(model).map_msg(Msg::Header),
