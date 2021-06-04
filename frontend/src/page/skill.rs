@@ -11,7 +11,9 @@ pub enum Msg {
     Received(Vec<Skill>),
 }
 
-pub fn init(mut _orders: impl Orders<Msg>) {}
+pub fn init(mut _orders: impl Orders<Msg>, id: &String) {
+    document().set_title(id);
+}
 
 pub fn generate_skill_list(model: &Model) -> Vec<Node<Msg>> {
     seed::log("matched skills:");
@@ -103,7 +105,7 @@ pub fn update(orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
 
 
 #[allow(clippy::too_many_lines)]
-pub fn view(model: &Model) -> Node<Msg> {
+pub fn view(model: &Model, _id: &String) -> Node<Msg> {
     if !model.matched_skills.is_empty() {
         seed::log(&model.matched_skills[0].skill);
     }

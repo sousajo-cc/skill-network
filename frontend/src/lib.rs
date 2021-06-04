@@ -34,10 +34,10 @@ pub enum Msg {
 
 fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
     let model = Model::new(url);
-    match model.page {
+    match &model.page {
         Page::Home => page::home::init(orders.proxy(Msg::Home)),
         Page::About => page::about::init(orders.proxy(Msg::About)),
-        Page::Skill => page::skill::init(orders.proxy(Msg::Skill)),
+        Page::Skill(id) => page::skill::init(orders.proxy(Msg::Skill), id),
         Page::NotFound => page::not_found::init(orders.proxy(Msg::NotFound)),
     }
     model
@@ -61,10 +61,10 @@ pub fn view(model: &Model) -> impl IntoNodes<Msg> {
             C.flex,
             C.flex_col,
         ],
-        match model.page {
+        match &model.page {
             Page::Home => page::home::view(model).map_msg(Msg::Home),
             Page::About => page::about::view().map_msg(Msg::About),
-            Page::Skill => page::skill::view(model).map_msg(Msg::Skill),
+            Page::Skill(id) => page::skill::view(model, &id).map_msg(Msg::Skill),
             Page::NotFound => page::not_found::view().map_msg(Msg::NotFound),
         },
         page::partial::header::view(model).map_msg(Msg::Header),

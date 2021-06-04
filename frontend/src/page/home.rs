@@ -12,6 +12,7 @@ pub enum Msg {
 }
 
 pub fn init(mut orders: impl Orders<Msg>) {
+    document().set_title(TITLE_SUFFIX);
     orders
         .subscribe(Msg::UrlChanged)
         .stream(streams::window_event(Ev::Scroll, |_| Msg::Scrolled));

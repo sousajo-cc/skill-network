@@ -18,23 +18,22 @@ const _STATIC_PATH: &str = "static";
 const IMAGES_PATH: &str = "static/images";
 const MAIL_TO_US: &str = "mailto:company@company.com";
 
-#[derive(Clone, Copy, Eq, PartialEq)]
+#[derive(Clone, Eq, PartialEq)]
 pub enum Page {
     Home,
     About,
-    Skill,
+    Skill(String),
     NotFound,
 }
 
 impl Page {
     pub fn new(mut url: Url) -> Self {
-        let (page, title) = match url.remaining_path_parts().as_slice() {
-            [] => (Self::Home, TITLE_SUFFIX.to_owned()),
-            [ABOUT] => (Self::About, format!("About - {}", TITLE_SUFFIX)),
-            ["skill", id] => (Self::Skill, id.to_string()),
-            _ => (Self::NotFound, format!("404 - {}", TITLE_SUFFIX)),
+        let page = match url.remaining_path_parts().as_slice() {
+            [] => Self::Home,
+            [ABOUT] => Self::About,
+            ["skill", id] => Self::Skill(id.to_string()),
+            _ => Self::NotFound,
         };
-        document().set_title(&title);
         page
     }
 }
