@@ -8,6 +8,7 @@ pub struct Model {
     pub in_prerendering: bool,
     pub search_query: String,
     pub matched_skills: Vec<Skill>,
+    pub matched_employees: Vec<Employee>,
 }
 
 impl Model {
@@ -20,6 +21,7 @@ impl Model {
             in_prerendering: is_in_prerendering(),
             search_query: String::new(),
             matched_skills: Vec::new(),
+            matched_employees: Vec::new(),
         }
     }
 }

@@ -6,45 +6,39 @@ pub enum Msg {
     ScrollToTop,
     Scrolled,
     ToggleMenu,
-    SearchQueryChanged(String),
     HideMenu,
-    Received(Vec<Skill>),
+    Received(Vec<Employee>),
 }
 
-pub fn init(mut _orders: impl Orders<Msg>, id: &String) {
+pub fn init(mut orders: impl Orders<Msg>, id: &String) {
     document().set_title(id);
+    request_employees(&mut orders, id);
 }
 
-pub fn generate_skill_list(model: &Model) -> Vec<Node<Msg>> {
-    seed::log("matched skills:");
-    seed::log(model.matched_skills.clone());
+fn request_employees(orders: &mut impl Orders<Msg>, id: &String) {
+    let url = format!("http://localhost:8000/list_employees_with_skill/{}", id);
+    let request = Request::new(url)
+        .method(Method::Get)
+        .header(Header::custom("Accept-Language", "en"));
 
-    model
-        .matched_skills
-        .clone()
-        .iter()
-        .map(
-            |skill| ul![
-                C![
-                    C.text_25,
-                    C.relative, C.pl_4, C.pr_4,
-                ],
-                 button![
-                     a![
-                         attrs!{
-                            At::Href => Urls::new(&model.base_url).about()
-                         },
-                        span![
-                            skill.skill.clone()
-                        ]
-                     ]
-                ]
-            ],
-        )
-        .collect()
+    orders.perform_cmd(async {
+        let response = fetch(request).await.expect("HTTP request failed");
+        if response.status().is_ok() {
+            seed::log("request ok!");
+        } else {
+            seed::log("request nok!");
+        }
+        let employee_list = response
+            .check_status()
+            .expect("status check failed")
+            .json::<Vec<Employee>>()
+            .await
+            .expect("deserialization failed");
+        Msg::Received(employee_list)
+    });
 }
 
-pub fn update(orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
+pub fn update(_orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
     match msg {
         Msg::UrlChanged(subs::UrlChanged(url)) => {
@@ -67,47 +61,45 @@ pub fn update(orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
         Msg::HideMenu => {
             model.menu_visibility = Visibility::Hidden;
         },
-        Msg::SearchQueryChanged(query) => {
-            model.search_query = query.clone();
-
-            if query.is_empty() {
-                model.matched_skills = Vec::<Skill>::new();
-                return;
-            }
-
-            let url = format!("http://localhost:8000/skill/search/{}", query);
-            let request = Request::new(url)
-                .method(Method::Get)
-                .header(Header::custom("Accept-Language", "en"));
-
-            orders.perform_cmd(async {
-                let response = fetch(request).await.expect("HTTP request failed");
-                if response.status().is_ok() {
-                    seed::log("request ok!");
-                } else {
-                    seed::log("request nok!");
-                }
-                let skill_list = response
-                    .check_status()
-                    .expect("status check failed")
-                    .json::<Vec<Skill>>()
-                    .await
-                    .expect("deserialization failed");
-                Msg::Received(skill_list)
-            });
-            log!("search query changed 5");
-        },
-        Msg::Received(skills) => {
-            model.matched_skills = skills;
+        Msg::Received(employees) => {
+            model.matched_employees = employees;
         }
     }
 }
 
+fn list_employees(model: &Model, id: &String) -> Vec<Node<Msg>> {
+    seed::log!("employees:", id);
+    seed::log(&model.matched_employees);
+
+    model
+        .matched_employees
+        .clone()
+        .iter()
+        .map(
+            |employee| ul![
+                C![
+                    C.text_25,
+                    C.relative, C.pl_4, C.pr_4,
+                ],
+                 button![
+                     a![
+                         attrs!{
+                            At::Href => Urls::new(&model.base_url).about()
+                         },
+                        span![
+                            employee.name.clone()
+                        ]
+                     ]
+                ]
+            ],
+        )
+        .collect()
+}
 
 #[allow(clippy::too_many_lines)]
-pub fn view(model: &Model, _id: &String) -> Node<Msg> {
-    if !model.matched_skills.is_empty() {
-        seed::log(&model.matched_skills[0].skill);
+pub fn view(model: &Model, id: &String) -> Node<Msg> {
+    if !model.matched_employees.is_empty() {
+        seed::log(&model.matched_employees[0].name);
     }
     div![
         C![C.flex_grow,],
@@ -241,10 +233,9 @@ pub fn view(model: &Model, _id: &String) -> Node<Msg> {
                                     At::Placeholder => "Search",
                                     At::Value => model.search_query,
                                 },
-                                input_ev(Ev::Input, |s| Msg::SearchQueryChanged(s)),
                             ]
                         ],
-                        div![nodes!(generate_skill_list(model))]
+                        div![nodes!(list_employees(model, id))]
                     ]
                 ],
             ],
