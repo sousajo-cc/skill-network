@@ -63,3 +63,4 @@ pub fn image_src(image: &str) -> String {
 pub fn _asset_path(asset: &str) -> String {
     format!("{}/{}", _STATIC_PATH, asset)
 }
+
