@@ -9,3 +9,4 @@ pub struct Model {
     pub search_query: String,
     pub matched_skills: Vec<Skill>,
 }
+

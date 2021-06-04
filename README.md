@@ -44,10 +44,10 @@ cargo install wasm-pack
 rustup target add wasm32-unknown-unknown
 cd frontend
 yarn install --pure-lockfile
-yarn global add webpack
-yarn global add serve
-yarn global add webpack-cli
-yarn global add webpack-dev-server
+yarn add webpack
+yarn add serve
+yarn add webpack-cli
+yarn add webpack-dev-server
 ```
 
 ### Build and Run without docker
