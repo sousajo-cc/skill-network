@@ -11,9 +11,9 @@ jobs:
       before_script: cd backend/ 
       script: cargo +nightly build
     - stage: frontend
-      script: docker-compose up --build --remove-orphans
+      script: docker-compose build 
 
 stages:
   - backend
-  - frontend 
+  - frontend
 
