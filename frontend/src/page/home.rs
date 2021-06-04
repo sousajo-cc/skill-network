@@ -1,6 +1,4 @@
-use crate::{generated::css_classes::C, Urls, Page, ScrollHistory, Visibility, Skill, is_in_prerendering};
-use seed::{prelude::*, *};
-use crate::Visibility::Hidden;
+use crate::page::*;
 
 #[derive(Debug)]
 pub enum Msg {
@@ -13,18 +11,7 @@ pub enum Msg {
     Received(Vec<Skill>),
 }
 
-
-pub struct Model {
-    pub base_url: Url,
-    pub page: Page,
-    pub scroll_history: ScrollHistory,
-    pub menu_visibility: Visibility,
-    pub in_prerendering: bool,
-    pub search_query: String,
-    pub matched_skills: Vec<Skill>,
-}
-
-pub fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
+pub fn init(url: Url, mut orders: impl Orders<Msg>) -> Model {
     orders
         .subscribe(Msg::UrlChanged)
         .stream(streams::window_event(Ev::Scroll, |_| Msg::Scrolled));
@@ -33,7 +20,7 @@ pub fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
         base_url: url.to_base_url(),
         page: Page::init(url),
         scroll_history: ScrollHistory::new(),
-        menu_visibility: Hidden,
+        menu_visibility: Visibility::Hidden,
         in_prerendering: is_in_prerendering(),
         search_query: String::new(),
         matched_skills: Vec::new(),
@@ -90,7 +77,7 @@ pub fn update(orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
         },
         Msg::ToggleMenu => model.menu_visibility.toggle(),
         Msg::HideMenu => {
-            model.menu_visibility = Hidden;
+            model.menu_visibility = Visibility::Hidden;
         },
         Msg::SearchQueryChanged(query) => {
             model.search_query = query.clone();
