@@ -16,17 +16,14 @@ use generated::css_classes::C;
 mod generated;
 mod page;
 
+use page::Model;
+
 #[macro_use]
 extern crate serde_derive;
 
-pub enum Model {
-    Home(page::home::Model),
-}
-
 fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
     let orders = orders.proxy(Msg::Home);
-    let page = page::home::init(url, orders);
-    Model::Home(page)
+    page::home::init(url, orders)
 }
 
 #[derive(Debug)]
@@ -39,9 +36,9 @@ pub enum Msg {
 }
 
 pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
-    match (model, msg) {
-        (Model::Home(inner_model), Msg::Home(inner_msg)) =>
-            page::home::update(&mut orders.proxy(Msg::Home), inner_model, inner_msg),
+    match msg {
+        Msg::Home(inner_msg) =>
+            page::home::update(&mut orders.proxy(Msg::Home), model, inner_msg),
         _ => unimplemented!()
     }
 }
@@ -49,24 +46,21 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
 pub fn view(model: &Model) -> impl IntoNodes<Msg> {
     use page::Page;
 
-    match model {
-        Model::Home(inner_model) =>
-            div![
-            C![
-                IF!(not(inner_model.in_prerendering) => C.fade_in),
-                C.min_h_screen,
-                C.flex,
-                C.flex_col,
-            ],
-            match inner_model.page {
-                Page::Home => page::home::view(&inner_model).map_msg(|msg| Msg::Home(msg)),
-                Page::About => page::about::view().map_msg(|msg| Msg::About(msg)),
-                Page::NotFound => page::not_found::view().map_msg(|msg| Msg::NotFound(msg)),
-            },
-            page::partial::header::view(inner_model).map_msg(|msg| Msg::Header(msg)),
-            page::partial::footer::view().map_msg(|msg| Msg::Footer(msg)),
-        ]
-    }
+    div![
+        C![
+            IF!(not(model.in_prerendering) => C.fade_in),
+            C.min_h_screen,
+            C.flex,
+            C.flex_col,
+        ],
+        match model.page {
+            Page::Home => page::home::view(&model).map_msg(|msg| Msg::Home(msg)),
+            Page::About => page::about::view().map_msg(|msg| Msg::About(msg)),
+            Page::NotFound => page::not_found::view().map_msg(|msg| Msg::NotFound(msg)),
+        },
+        page::partial::header::view(model).map_msg(|msg| Msg::Header(msg)),
+        page::partial::footer::view().map_msg(|msg| Msg::Footer(msg)),
+    ]
 }
 
 #[wasm_bindgen(start)]

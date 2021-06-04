@@ -1,7 +1,6 @@
 use crate::page::*;
-use crate::page::home::Model;
 
- #[derive(Debug)]
+#[derive(Debug)]
 pub enum Msg {
     UrlChanged(subs::UrlChanged),
     ScrollToTop,

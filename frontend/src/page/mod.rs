@@ -7,7 +7,7 @@ pub mod partial;
 
 use seed::{prelude::*, *};
 use crate::generated::css_classes::C;
-use common::*;
+pub use common::*;
 use fixed_vec_deque::FixedVecDeque;
 
 const TITLE_SUFFIX: &str = "Company";
