@@ -13,10 +13,12 @@ use fixed_vec_deque::FixedVecDeque;
 
 const TITLE_SUFFIX: &str = "Company";
 const ABOUT: &str = "about";
+const SKILL: &str = "skill";
 const USER_AGENT_FOR_PRERENDERING: &str = "ReactSnap";
 const _STATIC_PATH: &str = "static";
 const IMAGES_PATH: &str = "static/images";
 const MAIL_TO_US: &str = "mailto:company@company.com";
+const BACKEND_ADDRESS: &str = "http://localhost:8000";
 
 #[derive(Clone, Eq, PartialEq)]
 pub enum Page {
@@ -31,7 +33,7 @@ impl Page {
         let page = match url.remaining_path_parts().as_slice() {
             [] => Self::Home,
             [ABOUT] => Self::About,
-            ["skill", id] => Self::Skill(id.to_string()),
+            [SKILL, id] => Self::Skill(id.to_string()),
             _ => Self::NotFound,
         };
         page
@@ -45,6 +47,11 @@ impl<'a> Urls<'a> {
     }
     pub fn about(self) -> Url {
         self.base_url().add_path_part(ABOUT)
+    }
+    pub fn skill(self, id: &String) -> Url {
+        self.base_url()
+            .add_path_part(SKILL)
+            .add_path_part(id)
     }
 }
 
