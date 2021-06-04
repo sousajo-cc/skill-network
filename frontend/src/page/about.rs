@@ -1,14 +1,7 @@
 use crate::page::*;
 
 #[derive(Debug)]
-pub enum Msg {
-    UrlChanged(subs::UrlChanged),
-    ScrollToTop,
-    Scrolled,
-    ToggleMenu,
-    SearchQueryChanged(String),
-    HideMenu,
-}
+pub enum Msg {}
 
 #[allow(clippy::too_many_lines)]
 pub fn view() -> Node<Msg> {
