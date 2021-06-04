@@ -13,7 +13,7 @@ use fixed_vec_deque::FixedVecDeque;
 const TITLE_SUFFIX: &str = "Company";
 const ABOUT: &str = "about";
 const USER_AGENT_FOR_PRERENDERING: &str = "ReactSnap";
-const STATIC_PATH: &str = "static";
+const _STATIC_PATH: &str = "static";
 const IMAGES_PATH: &str = "static/images";
 const MAIL_TO_US: &str = "mailto:company@company.com";
 
@@ -60,6 +60,6 @@ pub fn image_src(image: &str) -> String {
     format!("{}/{}", IMAGES_PATH, image)
 }
 
-pub fn asset_path(asset: &str) -> String {
-    format!("{}/{}", STATIC_PATH, asset)
+pub fn _asset_path(asset: &str) -> String {
+    format!("{}/{}", _STATIC_PATH, asset)
 }

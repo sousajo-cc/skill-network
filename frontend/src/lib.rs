@@ -1,4 +1,4 @@
-//#![deny(warnings)]
+#![deny(warnings)]
 #![allow(
     clippy::used_underscore_binding,
     clippy::non_ascii_literal,
@@ -21,11 +21,6 @@ use page::Model;
 #[macro_use]
 extern crate serde_derive;
 
-fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
-    let orders = orders.proxy(Msg::Home);
-    page::home::init(url, orders)
-}
-
 #[derive(Debug)]
 pub enum Msg {
     Home(page::home::Msg),
@@ -33,6 +28,11 @@ pub enum Msg {
     NotFound(page::not_found::Msg),
     Header(page::partial::header::Msg),
     Footer(page::partial::footer::Msg),
+}
+
+fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
+    let orders = orders.proxy(Msg::Home);
+    page::home::init(url, orders)
 }
 
 pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
@@ -54,7 +54,7 @@ pub fn view(model: &Model) -> impl IntoNodes<Msg> {
             C.flex_col,
         ],
         match model.page {
-            Page::Home => page::home::view(&model).map_msg(Msg::Home),
+            Page::Home => page::home::view(model).map_msg(Msg::Home),
             Page::About => page::about::view().map_msg(Msg::About),
             Page::NotFound => page::not_found::view().map_msg(Msg::NotFound),
         },
