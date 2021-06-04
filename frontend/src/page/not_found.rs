@@ -3,6 +3,8 @@ use crate::page::*;
 #[derive(Debug)]
 pub enum Msg {}
 
+pub fn init(mut _orders: impl Orders<Msg>) {}
+
 pub fn view() -> Node<Msg> {
     div![
         C![

@@ -11,20 +11,10 @@ pub enum Msg {
     Received(Vec<Skill>),
 }
 
-pub fn init(url: Url, mut orders: impl Orders<Msg>) -> Model {
+pub fn init(mut orders: impl Orders<Msg>) {
     orders
         .subscribe(Msg::UrlChanged)
         .stream(streams::window_event(Ev::Scroll, |_| Msg::Scrolled));
-
-    Model {
-        base_url: url.to_base_url(),
-        page: Page::init(url),
-        scroll_history: ScrollHistory::new(),
-        menu_visibility: Visibility::Hidden,
-        in_prerendering: is_in_prerendering(),
-        search_query: String::new(),
-        matched_skills: Vec::new(),
-    }
 }
 
 pub fn generate_skill_list(model: &Model) -> Vec<Node<Msg>> {
@@ -60,7 +50,7 @@ pub fn update(orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
     match msg {
         Msg::UrlChanged(subs::UrlChanged(url)) => {
-            model.page = Page::init(url);
+            model.page = Page::new(url);
         },
         Msg::ScrollToTop => window().scroll_to_with_scroll_to_options(
             web_sys::ScrollToOptions::new().top(0.),

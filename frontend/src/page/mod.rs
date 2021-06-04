@@ -27,7 +27,7 @@ pub enum Page {
 }
 
 impl Page {
-    pub fn init(mut url: Url) -> Self {
+    pub fn new(mut url: Url) -> Self {
         let (page, title) = match url.remaining_path_parts().as_slice() {
             [] => (Self::Home, TITLE_SUFFIX.to_owned()),
             [ABOUT] => (Self::About, format!("About - {}", TITLE_SUFFIX)),

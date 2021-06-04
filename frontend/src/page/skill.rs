@@ -11,6 +11,8 @@ pub enum Msg {
     Received(Vec<Skill>),
 }
 
+pub fn init(mut _orders: impl Orders<Msg>) {}
+
 pub fn generate_skill_list(model: &Model) -> Vec<Node<Msg>> {
     seed::log("matched skills:");
     seed::log(model.matched_skills.clone());
@@ -44,7 +46,7 @@ pub fn update(orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
     match msg {
         Msg::UrlChanged(subs::UrlChanged(url)) => {
-            model.page = Page::init(url);
+            model.page = Page::new(url);
         },
         Msg::ScrollToTop => window().scroll_to_with_scroll_to_options(
             web_sys::ScrollToOptions::new().top(0.),

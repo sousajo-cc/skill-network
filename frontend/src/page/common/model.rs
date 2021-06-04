@@ -10,3 +10,16 @@ pub struct Model {
     pub matched_skills: Vec<Skill>,
 }
 
+impl Model {
+    pub fn new(url: Url) -> Self {
+        Model {
+            base_url: url.to_base_url(),
+            page: Page::new(url),
+            scroll_history: ScrollHistory::new(),
+            menu_visibility: Visibility::Hidden,
+            in_prerendering: is_in_prerendering(),
+            search_query: String::new(),
+            matched_skills: Vec::new(),
+        }
+    }
+}

@@ -17,6 +17,7 @@ mod generated;
 mod page;
 
 use page::Model;
+use page::Page;
 
 #[macro_use]
 extern crate serde_derive;
@@ -32,8 +33,14 @@ pub enum Msg {
 }
 
 fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
-    let orders = orders.proxy(Msg::Home);
-    page::home::init(url, orders)
+    let model = Model::new(url);
+    match model.page {
+        Page::Home => page::home::init(orders.proxy(Msg::Home)),
+        Page::About => page::about::init(orders.proxy(Msg::About)),
+        Page::Skill => page::skill::init(orders.proxy(Msg::Skill)),
+        Page::NotFound => page::not_found::init(orders.proxy(Msg::NotFound)),
+    }
+    model
 }
 
 pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
@@ -47,8 +54,6 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
 }
 
 pub fn view(model: &Model) -> impl IntoNodes<Msg> {
-    use page::Page;
-
     div![
         C![
             IF!(not(model.in_prerendering) => C.fade_in),
