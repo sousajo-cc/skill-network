@@ -1,0 +1,19 @@
+sudo: false
+language: rust
+rust:
+  - nightly
+services:
+  - docker
+
+jobs:
+  include:
+    - stage: backend
+      before_script: cd backend/ 
+      script: cargo +nightly build
+    - stage: frontend
+      script: docker-compose build 
+
+stages:
+  - backend
+  - frontend
+
