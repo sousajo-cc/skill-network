@@ -5,3 +5,15 @@ rust:
 services:
   - docker
 
+jobs:
+  include:
+    - stage: backend
+      before_script: cd backend/ 
+      script: cargo +nightly build
+    - stage: frontend
+      script: docker-compose up --build --remove-orphans
+
+stages:
+  - backend
+  - frontend 
+
