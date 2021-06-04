@@ -54,12 +54,12 @@ pub fn view(model: &Model) -> impl IntoNodes<Msg> {
             C.flex_col,
         ],
         match model.page {
-            Page::Home => page::home::view(&model).map_msg(|msg| Msg::Home(msg)),
-            Page::About => page::about::view().map_msg(|msg| Msg::About(msg)),
-            Page::NotFound => page::not_found::view().map_msg(|msg| Msg::NotFound(msg)),
+            Page::Home => page::home::view(&model).map_msg(Msg::Home),
+            Page::About => page::about::view().map_msg(Msg::About),
+            Page::NotFound => page::not_found::view().map_msg(Msg::NotFound),
         },
-        page::partial::header::view(model).map_msg(|msg| Msg::Header(msg)),
-        page::partial::footer::view().map_msg(|msg| Msg::Footer(msg)),
+        page::partial::header::view(model).map_msg(Msg::Header),
+        page::partial::footer::view().map_msg(Msg::Footer),
     ]
 }
 
