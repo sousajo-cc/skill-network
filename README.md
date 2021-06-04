@@ -24,7 +24,7 @@ Install usual rust stuff (cargo, rustc nightly).
 Install libsqlite3-dev.
 
 ```
-cargo install diesel_cli --no-default-features --features "sqlite"
+cargo install diesel_cli --no-default-features --features "sqlite-bundled"
 diesel migration run
 ```
 
