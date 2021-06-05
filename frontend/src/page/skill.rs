@@ -2,23 +2,14 @@ use crate::page::*;
 
 #[derive(Debug)]
 pub enum Msg {
-    UrlChanged(subs::UrlChanged),
-    ScrollToTop,
-    Scrolled,
-    ToggleMenu,
-    HideMenu,
     SkillLoaded(Skill),
     EmployeeListLoaded(Vec<Employee>),
 }
 
 pub fn init(mut orders: impl Orders<Msg>, id: &String) {
     document().set_title(id);
-
-    orders
-        .subscribe(Msg::UrlChanged);
-
+    scroll_to_top();
     request_skill(&mut orders, id);
-
     request_employees(&mut orders, id);
 }
 
@@ -71,26 +62,6 @@ fn request_employees(orders: &mut impl Orders<Msg>, id: &String) {
 pub fn update(_orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
     match msg {
-        Msg::UrlChanged(subs::UrlChanged(url)) => {
-            model.page = Page::new(url);
-        },
-        Msg::ScrollToTop => window().scroll_to_with_scroll_to_options(
-            web_sys::ScrollToOptions::new().top(0.),
-        ),
-        Msg::Scrolled => {
-            let mut position = body().scroll_top();
-            if position == 0 {
-                position = document()
-                    .document_element()
-                    .expect("get document element")
-                    .scroll_top()
-            }
-            *model.scroll_history.push_back() = position;
-        },
-        Msg::ToggleMenu => model.menu_visibility.toggle(),
-        Msg::HideMenu => {
-            model.menu_visibility = Visibility::Hidden;
-        },
         Msg::SkillLoaded(skill) => {
             model.skill = Some(skill);
         }
@@ -100,10 +71,7 @@ pub fn update(_orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
     }
 }
 
-fn list_employees(model: &Model, id: &String) -> Vec<Node<Msg>> {
-    seed::log!("employees:", id);
-    seed::log(&model.matched_employees);
-
+fn list_employees(model: &Model) -> Vec<Node<Msg>> {
     model
         .matched_employees
         .clone()
@@ -132,7 +100,7 @@ fn list_employees(model: &Model, id: &String) -> Vec<Node<Msg>> {
 }
 
 #[allow(clippy::too_many_lines)]
-pub fn view(model: &Model, id: &String) -> Node<Msg> {
+pub fn view(model: &Model) -> Node<Msg> {
     if !model.matched_employees.is_empty() {
         seed::log(&model.matched_employees[0].name);
     }
@@ -208,7 +176,7 @@ pub fn view(model: &Model, id: &String) -> Node<Msg> {
                                     C.mb_6,
                                     C.lg__pt_0,
                                 ],
-                                div![nodes!(list_employees(model, id))]
+                                div![nodes!(list_employees(model))]
                             ]
                         ],
                     ],

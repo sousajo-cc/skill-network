@@ -2,7 +2,6 @@ use crate::page::*;
 
 #[derive(Debug)]
 pub enum Msg {
-    UrlChanged(subs::UrlChanged),
     ScrollToTop,
     Scrolled,
     ToggleMenu,
@@ -13,9 +12,7 @@ pub enum Msg {
 
 pub fn init(mut orders: impl Orders<Msg>) {
     document().set_title(TITLE_SUFFIX);
-    orders
-        .subscribe(Msg::UrlChanged)
-        .stream(streams::window_event(Ev::Scroll, |_| Msg::Scrolled));
+    orders.stream(streams::window_event(Ev::Scroll, |_| Msg::Scrolled));
 }
 
 pub fn generate_skill_list(model: &Model) -> Vec<Node<Msg>> {
@@ -50,9 +47,6 @@ pub fn generate_skill_list(model: &Model) -> Vec<Node<Msg>> {
 pub fn update(orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
     match msg {
-        Msg::UrlChanged(subs::UrlChanged(url)) => {
-            model.page = Page::new(url);
-        },
         Msg::ScrollToTop => window().scroll_to_with_scroll_to_options(
             web_sys::ScrollToOptions::new().top(0.),
         ),

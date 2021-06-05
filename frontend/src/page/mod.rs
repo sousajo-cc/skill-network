@@ -20,7 +20,7 @@ const IMAGES_PATH: &str = "static/images";
 const MAIL_TO_US: &str = "mailto:company@company.com";
 const BACKEND_ADDRESS: &str = "http://localhost:8000";
 
-#[derive(Clone, Eq, PartialEq)]
+#[derive(Clone, Eq, PartialEq, Debug)]
 pub enum Page {
     Home,
     About,
@@ -30,13 +30,12 @@ pub enum Page {
 
 impl Page {
     pub fn new(mut url: Url) -> Self {
-        let page = match url.remaining_path_parts().as_slice() {
+        match url.remaining_path_parts().as_slice() {
             [] => Self::Home,
             [ABOUT] => Self::About,
             [SKILL, id] => Self::Skill(id.to_string()),
             _ => Self::NotFound,
-        };
-        page
+        }
     }
 }
 
@@ -63,6 +62,12 @@ fn is_in_prerendering() -> bool {
     let user_agent =
         window().navigator().user_agent().expect("cannot get user agent");
     user_agent == USER_AGENT_FOR_PRERENDERING
+}
+
+fn scroll_to_top() {
+    window().scroll_to_with_scroll_to_options(
+        web_sys::ScrollToOptions::new().top(0.),
+    );
 }
 
 pub fn image_src(image: &str) -> String {
