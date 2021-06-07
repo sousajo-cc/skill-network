@@ -2,7 +2,6 @@ use crate::page::*;
 
 #[derive(Debug)]
 pub enum Msg {
-    UrlChanged(subs::UrlChanged),
     ScrollToTop,
     Scrolled,
     ToggleMenu,
@@ -11,20 +10,9 @@ pub enum Msg {
     Received(Vec<Skill>),
 }
 
-pub fn init(url: Url, mut orders: impl Orders<Msg>) -> Model {
-    orders
-        .subscribe(Msg::UrlChanged)
-        .stream(streams::window_event(Ev::Scroll, |_| Msg::Scrolled));
-
-    Model {
-        base_url: url.to_base_url(),
-        page: Page::init(url),
-        scroll_history: ScrollHistory::new(),
-        menu_visibility: Visibility::Hidden,
-        in_prerendering: is_in_prerendering(),
-        search_query: String::new(),
-        matched_skills: Vec::new(),
-    }
+pub fn init(mut orders: impl Orders<Msg>) {
+    document().set_title(TITLE_SUFFIX);
+    orders.stream(streams::window_event(Ev::Scroll, |_| Msg::Scrolled));
 }
 
 pub fn generate_skill_list(model: &Model) -> Vec<Node<Msg>> {
@@ -44,7 +32,7 @@ pub fn generate_skill_list(model: &Model) -> Vec<Node<Msg>> {
                  button![
                      a![
                          attrs!{
-                            At::Href => Urls::new(&model.base_url).about()
+                            At::Href => Urls::new(&model.base_url).skill(&skill.id.to_string())
                          },
                         span![
                             skill.skill.clone()
@@ -59,9 +47,6 @@ pub fn generate_skill_list(model: &Model) -> Vec<Node<Msg>> {
 pub fn update(orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
     match msg {
-        Msg::UrlChanged(subs::UrlChanged(url)) => {
-            model.page = Page::init(url);
-        },
         Msg::ScrollToTop => window().scroll_to_with_scroll_to_options(
             web_sys::ScrollToOptions::new().top(0.),
         ),
@@ -87,7 +72,7 @@ pub fn update(orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
                 return;
             }
 
-            let url = format!("http://localhost:8000/skill/search/{}", query);
+            let url = format!("{}/skill/search/{}", BACKEND_ADDRESS, query);
             let request = Request::new(url)
                 .method(Method::Get)
                 .header(Header::custom("Accept-Language", "en"));

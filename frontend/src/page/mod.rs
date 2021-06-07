@@ -2,6 +2,7 @@ pub mod common;
 
 pub mod home;
 pub mod about;
+pub mod skill;
 pub mod not_found;
 pub mod partial;
 
@@ -12,27 +13,29 @@ use fixed_vec_deque::FixedVecDeque;
 
 const TITLE_SUFFIX: &str = "Company";
 const ABOUT: &str = "about";
+const SKILL: &str = "skill";
 const USER_AGENT_FOR_PRERENDERING: &str = "ReactSnap";
 const _STATIC_PATH: &str = "static";
 const IMAGES_PATH: &str = "static/images";
 const MAIL_TO_US: &str = "mailto:company@company.com";
+const BACKEND_ADDRESS: &str = "http://localhost:8000";
 
-#[derive(Clone, Copy, Eq, PartialEq)]
+#[derive(Clone, Eq, PartialEq, Debug)]
 pub enum Page {
     Home,
     About,
+    Skill(String),
     NotFound,
 }
 
 impl Page {
-    pub fn init(mut url: Url) -> Self {
-        let (page, title) = match url.remaining_path_parts().as_slice() {
-            [] => (Self::Home, TITLE_SUFFIX.to_owned()),
-            [ABOUT] => (Self::About, format!("About - {}", TITLE_SUFFIX)),
-            _ => (Self::NotFound, format!("404 - {}", TITLE_SUFFIX)),
-        };
-        document().set_title(&title);
-        page
+    pub fn new(mut url: Url) -> Self {
+        match url.remaining_path_parts().as_slice() {
+            [] => Self::Home,
+            [ABOUT] => Self::About,
+            [SKILL, id] => Self::Skill(id.to_string()),
+            _ => Self::NotFound,
+        }
     }
 }
 
@@ -44,6 +47,11 @@ impl<'a> Urls<'a> {
     pub fn about(self) -> Url {
         self.base_url().add_path_part(ABOUT)
     }
+    pub fn skill(self, id: &String) -> Url {
+        self.base_url()
+            .add_path_part(SKILL)
+            .add_path_part(id)
+    }
 }
 
 // We need at least 3 last values to detect scroll direction,
@@ -54,6 +62,12 @@ fn is_in_prerendering() -> bool {
     let user_agent =
         window().navigator().user_agent().expect("cannot get user agent");
     user_agent == USER_AGENT_FOR_PRERENDERING
+}
+
+fn scroll_to_top() {
+    window().scroll_to_with_scroll_to_options(
+        web_sys::ScrollToOptions::new().top(0.),
+    );
 }
 
 pub fn image_src(image: &str) -> String {

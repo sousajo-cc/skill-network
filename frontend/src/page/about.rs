@@ -3,6 +3,10 @@ use crate::page::*;
 #[derive(Debug)]
 pub enum Msg {}
 
+pub fn init(mut _orders: impl Orders<Msg>) {
+    document().set_title(&format!("About - {}", TITLE_SUFFIX));
+}
+
 #[allow(clippy::too_many_lines)]
 pub fn view() -> Node<Msg> {
     div![

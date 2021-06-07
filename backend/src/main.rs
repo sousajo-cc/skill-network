@@ -1,4 +1,4 @@
-//#![deny(warnings)]
+#![deny(warnings)]
 #![feature(proc_macro_hygiene, decl_macro)]
 
 mod api;
@@ -6,9 +6,7 @@ mod database;
 mod result;
 
 use rocket_cors::{AllowedHeaders, AllowedOrigins, Error};
-use calamine::{open_workbook, Xlsx, Reader, RangeDeserializerBuilder};
 use dotenv::dotenv;
-use database::models::employee::Employee;
 use database::models::skill::NewSkill;
 use database::establish_connection;
 use result::BackendError;

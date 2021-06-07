@@ -17,35 +17,50 @@ mod generated;
 mod page;
 
 use page::Model;
+use page::Page;
 
 #[macro_use]
 extern crate serde_derive;
 
 #[derive(Debug)]
 pub enum Msg {
+    UrlChanged(subs::UrlChanged),
     Home(page::home::Msg),
     About(page::about::Msg),
+    Skill(page::skill::Msg),
     NotFound(page::not_found::Msg),
     Header(page::partial::header::Msg),
     Footer(page::partial::footer::Msg),
 }
 
 fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
-    let orders = orders.proxy(Msg::Home);
-    page::home::init(url, orders)
+
+    orders.subscribe(Msg::UrlChanged);
+
+    let model = Model::new(url);
+    match &model.page {
+        Page::Home => page::home::init(orders.proxy(Msg::Home)),
+        Page::About => page::about::init(orders.proxy(Msg::About)),
+        Page::Skill(id) => page::skill::init(orders.proxy(Msg::Skill), id),
+        Page::NotFound => page::not_found::init(orders.proxy(Msg::NotFound)),
+    }
+    model
 }
 
 pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
     match msg {
+        Msg::UrlChanged(subs::UrlChanged(url)) => {
+            *model = init(url, orders);
+        },
         Msg::Home(inner_msg) =>
             page::home::update(&mut orders.proxy(Msg::Home), model, inner_msg),
+        Msg::Skill(inner_msg) =>
+            page::skill::update(&mut orders.proxy(Msg::Skill), model, inner_msg),
         _ => unimplemented!()
     }
 }
 
 pub fn view(model: &Model) -> impl IntoNodes<Msg> {
-    use page::Page;
-
     div![
         C![
             IF!(not(model.in_prerendering) => C.fade_in),
@@ -53,9 +68,10 @@ pub fn view(model: &Model) -> impl IntoNodes<Msg> {
             C.flex,
             C.flex_col,
         ],
-        match model.page {
+        match &model.page {
             Page::Home => page::home::view(model).map_msg(Msg::Home),
             Page::About => page::about::view().map_msg(Msg::About),
+            Page::Skill(_) => page::skill::view(model).map_msg(Msg::Skill),
             Page::NotFound => page::not_found::view().map_msg(Msg::NotFound),
         },
         page::partial::header::view(model).map_msg(Msg::Header),
