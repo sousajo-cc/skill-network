@@ -7,6 +7,16 @@ services:
 
 jobs:
   include:
+    - stage: clippy backend
+      before_script: cd backend/
+      script:
+        - rustup component add clippy
+        - cargo +nightly clippy
+    - stage: clippy frontend
+      before_script: cd frontend/
+      script:
+        - rustup component add clippy
+        - cargo +nightly clippy
     - stage: backend
       before_script: cd backend/ 
       script: cargo +nightly build
@@ -14,6 +24,8 @@ jobs:
       script: docker-compose build 
 
 stages:
+  - clippy backend
+  - clippy frontend
   - backend
   - frontend
 
