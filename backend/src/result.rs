@@ -37,10 +37,10 @@ impl<'a> Responder<'a> for BackendError {
     fn respond_to(self, _request: &Request) -> Result<'a> {
         use rocket::http::Status;
 
-        let status = match self {
+        //let status = match self {
             //TODO: implement for each error type
-            _ => Status::InternalServerError,
-        };
+            let status = Status::InternalServerError;
+        //};
 
         Response::build().status(status).ok()
     }

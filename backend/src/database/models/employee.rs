@@ -15,12 +15,13 @@ impl Employee {
         employees_table.load::<Employee>(conn)
     }
 
-    pub fn find(conn: &SqliteConnection, employeenumber: &String) -> QueryResult<Employee>  {
+    pub fn find(conn: &SqliteConnection, employeenumber: &str) -> QueryResult<Employee>  {
         employees_table
             .filter(employee_number.eq(employeenumber))
             .get_result::<Employee>(conn)
     }
 
+    #[allow(clippy::ptr_arg)]
     pub fn filter(conn: &SqliteConnection, employee_name: &String) -> QueryResult<Vec<Employee>> {
         let employee_name = employee_name.sanitize();
         let employee_name = format!("%{}%", employee_name);
@@ -35,7 +36,7 @@ impl Employee {
             .execute(conn)
     }
 
-    pub fn insert_batch(conn: &SqliteConnection, values: Vec::<Employee>) -> QueryResult<usize>  {
+    pub fn insert_batch(conn: &SqliteConnection, values: Vec<Employee>) -> QueryResult<usize>  {
         diesel::insert_into(employees_table)
             .values(values)
             .execute(conn)

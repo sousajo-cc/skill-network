@@ -22,7 +22,7 @@ fn get_by_id(id: i32) -> Result<Json<Skill>, BackendError> {
 #[get("/search/<name>")]
 fn search_by_name(name: String) -> Result<Json<Vec<Skill>>, BackendError> {
     let connection = establish_connection();
-    let skill = Skill::filter(&connection, &name.to_string())?;
+    let skill = Skill::filter(&connection, &name)?;
     Ok(Json(skill))
 }
 

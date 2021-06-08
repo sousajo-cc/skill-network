@@ -47,7 +47,7 @@ impl<'a> Urls<'a> {
     pub fn about(self) -> Url {
         self.base_url().add_path_part(ABOUT)
     }
-    pub fn skill(self, id: &String) -> Url {
+    pub fn skill(self, id: &str) -> Url {
         self.base_url()
             .add_path_part(SKILL)
             .add_path_part(id)

@@ -16,7 +16,7 @@ fn get_all() -> Result<Json<Vec<Employee>>, BackendError> {
 fn get_by_employeenumber(employeenumber: String) -> Result<Json<Employee>, BackendError> {
     // try this with http://localhost:8000/employee/get_by_employeenumber/00767
     let connection = establish_connection();
-    let employee_by_q_nr = Employee::find(&connection, &employeenumber.to_string())?;
+    let employee_by_q_nr = Employee::find(&connection, &employeenumber)?;
     Ok(Json(employee_by_q_nr))
 }
 
@@ -24,7 +24,7 @@ fn get_by_employeenumber(employeenumber: String) -> Result<Json<Employee>, Backe
 fn search_by_name(name: String) -> Result<Json<Vec<Employee>>, BackendError> {
     // try this with http://localhost:8000/employee/get_by_name/Jorge
     let connection = establish_connection();
-    let employee_by_name = Employee::filter(&connection, &name.to_string())?;
+    let employee_by_name = Employee::filter(&connection, &name)?;
     Ok(Json(employee_by_name))
 }
 

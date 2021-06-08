@@ -7,14 +7,14 @@ pub enum Msg {
     RequestNOK(String),
 }
 
-pub fn init(mut orders: impl Orders<Msg>, id: &String) {
+pub fn init(mut orders: impl Orders<Msg>, id: &str) {
     document().set_title("Skill");
     scroll_to_top();
     request_skill(&mut orders, id);
     request_employees(&mut orders, id);
 }
 
-fn request_skill(orders: &mut impl Orders<Msg>, id: &String) {
+fn request_skill(orders: &mut impl Orders<Msg>, id: &str) {
     let url = format!("{}/skill/{}", BACKEND_ADDRESS, id);
     let request = Request::new(url)
         .method(Method::Get)
@@ -42,7 +42,7 @@ fn request_skill(orders: &mut impl Orders<Msg>, id: &String) {
     });
 }
 
-fn request_employees(orders: &mut impl Orders<Msg>, id: &String) {
+fn request_employees(orders: &mut impl Orders<Msg>, id: &str) {
     let url = format!("{}/list_employees_with_skill/{}", BACKEND_ADDRESS, id);
     let request = Request::new(url)
         .method(Method::Get)
