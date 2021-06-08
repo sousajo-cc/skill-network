@@ -238,7 +238,7 @@ pub fn view(model: &Model) -> Node<Msg> {
                                     At::Placeholder => "Search",
                                     At::Value => model.search_query,
                                 },
-                                input_ev(Ev::Input, |s| Msg::SearchQueryChanged(s)),
+                                input_ev(Ev::Input, Msg::SearchQueryChanged),
                             ]
                         ],
                         div![nodes!(generate_skill_list(model))]
