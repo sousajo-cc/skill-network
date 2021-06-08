@@ -13,6 +13,7 @@ pub struct Model {
     //skill page
     pub skill: Option<Skill>,
     pub matched_employees: Vec<Employee>,
+    pub error: Option<String>,
 }
 
 impl Model {
@@ -27,6 +28,7 @@ impl Model {
             matched_skills: Vec::new(),
             skill: None,
             matched_employees: Vec::new(),
+            error: None,
         }
     }
 }
