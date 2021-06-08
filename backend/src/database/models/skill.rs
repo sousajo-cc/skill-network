@@ -21,6 +21,7 @@ impl Skill {
             .get_result::<Skill>(conn)
     }
 
+    #[allow(clippy::ptr_arg)]
     pub fn filter(conn: &SqliteConnection, skill_name: &String) -> QueryResult<Vec<Skill>> {
         let skill_name = skill_name.sanitize();
         let skill_name = format!("%{}%", skill_name);
