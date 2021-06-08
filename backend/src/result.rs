@@ -1,6 +1,7 @@
 use rocket::response::*;
 use rocket::Request;
 
+#[allow(clippy::enum_variant_names)]
 #[derive(Debug)]
 pub enum BackendError {
     CalamineError(calamine::Error),

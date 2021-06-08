@@ -77,7 +77,7 @@ fn match_employees(
     };
     let matched_employees = match matched_employees {
         Some(vec) => vec,
-        None => Employee::list(&connection)?,
+        None => Employee::list(connection)?,
     };
     Ok(matched_employees)
 }
