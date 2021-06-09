@@ -78,7 +78,8 @@ pub fn update(orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
                 .header(Header::custom("Accept-Language", "en"));
 
             orders.perform_cmd(async {
-                let response = fetch(request).await.expect("HTTP request failed");
+                let response =
+                    fetch(request).await.expect("HTTP request failed");
                 if response.status().is_ok() {
                     seed::log("request ok!");
                 } else {
@@ -96,10 +97,9 @@ pub fn update(orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
         },
         Msg::Received(skills) => {
             model.matched_skills = skills;
-        }
+        },
     }
 }
-
 
 #[allow(clippy::too_many_lines)]
 pub fn view(model: &Model) -> Node<Msg> {
