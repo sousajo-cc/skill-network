@@ -1,12 +1,12 @@
-use crate::database::models::tables::employee_skill::*;
-use crate::database::models::skill::Skill;
 use crate::database::models::employee::Employee;
+use crate::database::models::skill::Skill;
+use crate::database::models::tables::employee_skill::*;
 use crate::result::BackendError;
-use diesel::{RunQueryDsl, SqliteConnection};
 use diesel::prelude::*;
+use diesel::{RunQueryDsl, SqliteConnection};
 
 #[derive(Queryable, Serialize, Identifiable, Associations, Clone, Debug)]
-#[belongs_to(Employee, foreign_key="employee_number")]
+#[belongs_to(Employee, foreign_key = "employee_number")]
 #[belongs_to(Skill)]
 pub struct EmployeesSkill {
     pub id: i32,
@@ -15,42 +15,50 @@ pub struct EmployeesSkill {
 }
 
 impl EmployeesSkill {
-
     pub fn list(conn: &SqliteConnection) -> QueryResult<Vec<EmployeesSkill>> {
         employees_skills_table.load::<EmployeesSkill>(conn)
     }
 
-    pub fn find(conn: &SqliteConnection, employee_skill_id: i32) -> QueryResult<EmployeesSkill>  {
+    pub fn find(conn: &SqliteConnection, employee_skill_id: i32) -> QueryResult<EmployeesSkill> {
         employees_skills_table
             .filter(id.eq(employee_skill_id))
             .get_result::<EmployeesSkill>(conn)
     }
 
-    pub fn filter_by_employee(conn: &SqliteConnection, employee: Employee) -> QueryResult<Vec<EmployeesSkill>> {
-        EmployeesSkill::belonging_to(&employee)
-            .load::<EmployeesSkill>(conn)
+    pub fn filter_by_employee(
+        conn: &SqliteConnection,
+        employee: Employee,
+    ) -> QueryResult<Vec<EmployeesSkill>> {
+        EmployeesSkill::belonging_to(&employee).load::<EmployeesSkill>(conn)
     }
 
-    pub fn filter_by_employees(conn: &SqliteConnection, employees: Vec<Employee>) -> QueryResult<Vec<EmployeesSkill>> {
-        EmployeesSkill::belonging_to(&employees)
-            .load::<EmployeesSkill>(conn)
+    pub fn filter_by_employees(
+        conn: &SqliteConnection,
+        employees: Vec<Employee>,
+    ) -> QueryResult<Vec<EmployeesSkill>> {
+        EmployeesSkill::belonging_to(&employees).load::<EmployeesSkill>(conn)
     }
 
-    pub fn filter_by_skill(conn: &SqliteConnection, skill: Skill) -> QueryResult<Vec<EmployeesSkill>> {
-        EmployeesSkill::belonging_to(&skill)
-            .load::<EmployeesSkill>(conn)
+    pub fn filter_by_skill(
+        conn: &SqliteConnection,
+        skill: Skill,
+    ) -> QueryResult<Vec<EmployeesSkill>> {
+        EmployeesSkill::belonging_to(&skill).load::<EmployeesSkill>(conn)
     }
 
-    pub fn filter_by_skills(conn: &SqliteConnection, skills: Vec<Skill>) -> QueryResult<Vec<EmployeesSkill>> {
-        EmployeesSkill::belonging_to(&skills)
-            .load::<EmployeesSkill>(conn)
+    pub fn filter_by_skills(
+        conn: &SqliteConnection,
+        skills: Vec<Skill>,
+    ) -> QueryResult<Vec<EmployeesSkill>> {
+        EmployeesSkill::belonging_to(&skills).load::<EmployeesSkill>(conn)
     }
 
-    pub fn filter(conn: &SqliteConnection, employees: Vec<Employee>, skills: Vec<Skill>) -> QueryResult<Vec<EmployeesSkill>> {
-        let skills: Vec<i32> = skills
-            .iter()
-            .map(|skill| skill.id)
-            .collect();
+    pub fn filter(
+        conn: &SqliteConnection,
+        employees: Vec<Employee>,
+        skills: Vec<Skill>,
+    ) -> QueryResult<Vec<EmployeesSkill>> {
+        let skills: Vec<i32> = skills.iter().map(|skill| skill.id).collect();
         EmployeesSkill::belonging_to(&employees)
             .filter(skill_id.eq_any(skills))
             .load::<EmployeesSkill>(conn)
@@ -58,7 +66,7 @@ impl EmployeesSkill {
 }
 
 #[derive(Insertable, Deserialize, Clone)]
-#[table_name="employees_skills"]
+#[table_name = "employees_skills"]
 pub struct NewEmployeesSkill {
     pub employee_number: String,
     pub skill_id: i32,
@@ -71,7 +79,10 @@ impl NewEmployeesSkill {
             .execute(conn)
     }
 
-    pub fn insert_batch(conn: &SqliteConnection, values: Vec::<NewEmployeesSkill>) -> QueryResult<usize> {
+    pub fn insert_batch(
+        conn: &SqliteConnection,
+        values: Vec<NewEmployeesSkill>,
+    ) -> QueryResult<usize> {
         diesel::insert_into(employees_skills_table)
             .values(values)
             .execute(conn)

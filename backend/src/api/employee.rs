@@ -28,7 +28,7 @@ fn search_by_name(name: String) -> Result<Json<Vec<Employee>>, BackendError> {
     Ok(Json(employee_by_name))
 }
 
-#[post("/", data="<employee>")]
+#[post("/", data = "<employee>")]
 fn insert(employee: Json<Employee>) -> Result<Json<usize>, BackendError> {
     let connection = establish_connection();
     let employee = employee.into_inner();
@@ -36,7 +36,7 @@ fn insert(employee: Json<Employee>) -> Result<Json<usize>, BackendError> {
     Ok(Json(insert))
 }
 
-#[post("/batch", data="<employees>")]
+#[post("/batch", data = "<employees>")]
 fn insert_batch(employees: Json<Vec<Employee>>) -> Result<Json<usize>, BackendError> {
     let connection = establish_connection();
     let employees = employees.to_vec();
@@ -50,12 +50,15 @@ pub trait EmployeeApi {
 
 impl EmployeeApi for Rocket {
     fn mount_employee_api(self, base: &str) -> Self {
-        self.mount(base, routes![
-            get_all,
-            get_by_employeenumber,
-            search_by_name,
-            insert,
-            insert_batch,
-        ])
+        self.mount(
+            base,
+            routes![
+                get_all,
+                get_by_employeenumber,
+                search_by_name,
+                insert,
+                insert_batch,
+            ],
+        )
     }
 }

@@ -38,8 +38,8 @@ impl<'a> Responder<'a> for BackendError {
         use rocket::http::Status;
 
         //let status = match self {
-            //TODO: implement for each error type
-            let status = Status::InternalServerError;
+        //TODO: implement for each error type
+        let status = Status::InternalServerError;
         //};
 
         Response::build().status(status).ok()

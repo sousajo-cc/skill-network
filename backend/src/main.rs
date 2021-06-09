@@ -5,12 +5,12 @@ mod api;
 mod database;
 mod result;
 
-use rocket_cors::{AllowedHeaders, AllowedOrigins, Error};
-use dotenv::dotenv;
-use database::models::skill::NewSkill;
-use database::establish_connection;
-use result::BackendError;
 use crate::database::models::employee_skill::NewEmployeesSkill;
+use database::establish_connection;
+use database::models::skill::NewSkill;
+use dotenv::dotenv;
+use result::BackendError;
+use rocket_cors::{AllowedHeaders, AllowedOrigins, Error};
 
 extern crate dotenv;
 #[macro_use]
@@ -127,24 +127,28 @@ pub fn main() -> Result<(), Error> {
         allow_credentials: true,
         ..Default::default()
     }
-        .to_cors()?;
-    example().or_else(|e|
-        if let BackendError::DatabaseError(_) = e {
-            println!("Database already has values!");
-            Ok(())
-        } else {
-            Err(e)
-        }
-    ).unwrap();
+    .to_cors()?;
+    example()
+        .or_else(|e| {
+            if let BackendError::DatabaseError(_) = e {
+                println!("Database already has values!");
+                Ok(())
+            } else {
+                Err(e)
+            }
+        })
+        .unwrap();
 
-    skills_example().or_else(|e|
-        if let BackendError::DatabaseError(_) = e {
-            println!("Database already has values!");
-            Ok(())
-        } else {
-            Err(e)
-        }
-    ).unwrap();
+    skills_example()
+        .or_else(|e| {
+            if let BackendError::DatabaseError(_) = e {
+                println!("Database already has values!");
+                Ok(())
+            } else {
+                Err(e)
+            }
+        })
+        .unwrap();
 
     // employee_skill_example().or_else(|e|
     //     if let BackendError::DatabaseError(_) = e {
@@ -154,7 +158,6 @@ pub fn main() -> Result<(), Error> {
     //         Err(e)
     //     }
     // ).unwrap();
-
 
     rocket::ignite()
         .mount_employee_api("/employee")
