@@ -1,16 +1,16 @@
 use crate::page::*;
 
-//TODO: separate into a model for each page
+// TODO: separate into a model for each page
 pub struct Model {
     pub base_url: Url,
     pub page: Page,
     pub scroll_history: ScrollHistory,
     pub menu_visibility: Visibility,
     pub in_prerendering: bool,
-    //home
+    // home
     pub search_query: String,
     pub matched_skills: Vec<Skill>,
-    //skill page
+    // skill page
     pub skill: Option<Skill>,
     pub matched_employees: Vec<Employee>,
     pub error: Option<String>,

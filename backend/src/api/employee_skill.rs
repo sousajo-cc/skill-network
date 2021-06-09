@@ -2,9 +2,9 @@ use rocket::Rocket;
 use rocket_contrib::json::Json;
 
 use crate::database::establish_connection;
+use crate::database::models::employee::Employee;
 use crate::database::models::employee_skill::{EmployeesSkill, NewEmployeesSkill};
 use crate::database::models::skill::Skill;
-use crate::database::models::employee::Employee;
 use crate::result::BackendError;
 use diesel::SqliteConnection;
 
@@ -28,7 +28,7 @@ fn list_employees_with_skill(skill: i32) -> Result<Json<Vec<Employee>>, BackendE
 
     let connection = establish_connection();
     let skill = Skill::find(&connection, skill)?;
-    let employees  = EmployeesSkill::filter_by_skill(&connection, skill)?
+    let employees = EmployeesSkill::filter_by_skill(&connection, skill)?
         .into_iter()
         .map(|relation| Employee::find(&connection, &relation.employee_number))
         .collect::<QueryResult<Vec<Employee>>>()?;
@@ -54,15 +54,16 @@ fn search(
 fn match_employees(
     connection: &SqliteConnection,
     name: Option<String>,
-    employeenumber: Option<String>
+    employeenumber: Option<String>,
 ) -> Result<Vec<Employee>, BackendError> {
-    let matched_employees_by_name = name.map(|employee_name|
-        Employee::filter(connection, &employee_name)
-    );
-    let matched_employees_by_employeenumber = employeenumber.map(|employeenumber|
-        Employee::find(connection, &employeenumber)
-    );
-    let matched_employees = match (matched_employees_by_name, matched_employees_by_employeenumber) {
+    let matched_employees_by_name =
+        name.map(|employee_name| Employee::filter(connection, &employee_name));
+    let matched_employees_by_employeenumber =
+        employeenumber.map(|employeenumber| Employee::find(connection, &employeenumber));
+    let matched_employees = match (
+        matched_employees_by_name,
+        matched_employees_by_employeenumber,
+    ) {
         (None, None) => None,
         (None, Some(employee)) => Some(vec![employee?]),
         (Some(employees), None) => Some(employees?),
@@ -73,7 +74,7 @@ fn match_employees(
             } else {
                 None
             }
-        },
+        }
     };
     let matched_employees = match matched_employees {
         Some(vec) => vec,
@@ -82,7 +83,7 @@ fn match_employees(
     Ok(matched_employees)
 }
 
-#[post("/", data="<employee_skill>")]
+#[post("/", data = "<employee_skill>")]
 fn insert(employee_skill: Json<NewEmployeesSkill>) -> Result<Json<usize>, BackendError> {
     let connection = establish_connection();
     let employee_skill = employee_skill.into_inner();
@@ -90,8 +91,10 @@ fn insert(employee_skill: Json<NewEmployeesSkill>) -> Result<Json<usize>, Backen
     Ok(Json(insert))
 }
 
-#[post("/batch", data="<employee_skills>")]
-fn insert_batch(employee_skills: Json<Vec<NewEmployeesSkill>>) -> Result<Json<usize>, BackendError> {
+#[post("/batch", data = "<employee_skills>")]
+fn insert_batch(
+    employee_skills: Json<Vec<NewEmployeesSkill>>,
+) -> Result<Json<usize>, BackendError> {
     let connection = establish_connection();
     let employee_skills = employee_skills.into_inner();
     let insert = NewEmployeesSkill::insert_batch(&connection, employee_skills)?;
@@ -104,13 +107,16 @@ pub trait EmployeeSkillApi {
 
 impl EmployeeSkillApi for Rocket {
     fn mount_employee_skill_api(self, base: &str) -> Self {
-        self.mount(base, routes![
-            get_all,
-            get_by_id,
-            list_employees_with_skill,
-            search,
-            insert,
-            insert_batch,
-        ])
+        self.mount(
+            base,
+            routes![
+                get_all,
+                get_by_id,
+                list_employees_with_skill,
+                search,
+                insert,
+                insert_batch,
+            ],
+        )
     }
 }

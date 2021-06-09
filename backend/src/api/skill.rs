@@ -2,7 +2,7 @@ use rocket::Rocket;
 use rocket_contrib::json::Json;
 
 use crate::database::establish_connection;
-use crate::database::models::skill::{Skill, NewSkill};
+use crate::database::models::skill::{NewSkill, Skill};
 use crate::result::BackendError;
 
 #[get("/")]
@@ -26,7 +26,7 @@ fn search_by_name(name: String) -> Result<Json<Vec<Skill>>, BackendError> {
     Ok(Json(skill))
 }
 
-#[post("/", data="<skill>")]
+#[post("/", data = "<skill>")]
 fn insert(skill: Json<NewSkill>) -> Result<Json<usize>, BackendError> {
     let connection = establish_connection();
     let skill = skill.0;
@@ -34,7 +34,7 @@ fn insert(skill: Json<NewSkill>) -> Result<Json<usize>, BackendError> {
     Ok(Json(insert))
 }
 
-#[post("/batch", data="<skills>")]
+#[post("/batch", data = "<skills>")]
 fn insert_batch(skills: Json<Vec<NewSkill>>) -> Result<Json<usize>, BackendError> {
     let connection = establish_connection();
     let skills = skills.0;
@@ -48,12 +48,9 @@ pub trait SkillApi {
 
 impl SkillApi for Rocket {
     fn mount_skill_api(self, base: &str) -> Self {
-        self.mount(base, routes![
-            get_all,
-            get_by_id,
-            search_by_name,
-            insert,
-            insert_batch,
-        ])
+        self.mount(
+            base,
+            routes![get_all, get_by_id, search_by_name, insert, insert_batch,],
+        )
     }
 }

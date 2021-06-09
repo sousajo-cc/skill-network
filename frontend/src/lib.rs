@@ -9,15 +9,14 @@
 
 extern crate console_error_panic_hook;
 
-use seed::{*, prelude::*};
+use seed::{prelude::*, *};
 
 use generated::css_classes::C;
 
 mod generated;
 mod page;
 
-use page::Model;
-use page::Page;
+use page::{Model, Page};
 
 #[macro_use]
 extern crate serde_derive;
@@ -34,7 +33,6 @@ pub enum Msg {
 }
 
 fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
-
     orders.subscribe(Msg::UrlChanged);
 
     let model = Model::new(url);
@@ -52,11 +50,13 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
         Msg::UrlChanged(subs::UrlChanged(url)) => {
             *model = init(url, orders);
         },
-        Msg::Home(inner_msg) =>
-            page::home::update(&mut orders.proxy(Msg::Home), model, inner_msg),
-        Msg::Skill(inner_msg) =>
-            page::skill::update(&mut orders.proxy(Msg::Skill), model, inner_msg),
-        _ => unimplemented!()
+        Msg::Home(inner_msg) => {
+            page::home::update(&mut orders.proxy(Msg::Home), model, inner_msg)
+        },
+        Msg::Skill(inner_msg) => {
+            page::skill::update(&mut orders.proxy(Msg::Skill), model, inner_msg)
+        },
+        _ => unimplemented!(),
     }
 }
 

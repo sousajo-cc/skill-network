@@ -1,15 +1,15 @@
 pub mod common;
 
-pub mod home;
 pub mod about;
-pub mod skill;
+pub mod home;
 pub mod not_found;
 pub mod partial;
+pub mod skill;
 
-use seed::{prelude::*, *};
 use crate::generated::css_classes::C;
 pub use common::*;
 use fixed_vec_deque::FixedVecDeque;
+use seed::{prelude::*, *};
 
 const TITLE_SUFFIX: &str = "Company";
 const ABOUT: &str = "about";
@@ -44,13 +44,13 @@ impl<'a> Urls<'a> {
     pub fn home(self) -> Url {
         self.base_url()
     }
+
     pub fn about(self) -> Url {
         self.base_url().add_path_part(ABOUT)
     }
+
     pub fn skill(self, id: &str) -> Url {
-        self.base_url()
-            .add_path_part(SKILL)
-            .add_path_part(id)
+        self.base_url().add_path_part(SKILL).add_path_part(id)
     }
 }
 
@@ -77,4 +77,3 @@ pub fn image_src(image: &str) -> String {
 pub fn _asset_path(asset: &str) -> String {
     format!("{}/{}", _STATIC_PATH, asset)
 }
-
