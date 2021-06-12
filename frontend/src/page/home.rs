@@ -216,12 +216,9 @@ pub fn view(model: &Model) -> Node<Msg> {
                                 C![
                                     C.w_full,
                                     C.bg_gray_1,
-                                    // C.font_bold,
                                     C.text_25,
                                     C.text_25,
                                     IF!(model.search_query.is_empty() => C.font_bold),
-                                    // IF!(not(model.in_prerendering) => C.placeholder_green_800),
-                                    // IF!(model.in_prerendering => C.placeholder_green_400),
                                     C.placeholder_gray_4,
                                     C.border_b_4,
                                     C.border_gray_5,

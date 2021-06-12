@@ -5,6 +5,7 @@ pub mod home;
 pub mod not_found;
 pub mod partial;
 pub mod skill;
+pub mod employee;
 
 use crate::generated::css_classes::C;
 pub use common::*;
@@ -14,6 +15,7 @@ use seed::{prelude::*, *};
 const TITLE_SUFFIX: &str = "Company";
 const ABOUT: &str = "about";
 const SKILL: &str = "skill";
+const EMPLOYEE: &str = "employee";
 const USER_AGENT_FOR_PRERENDERING: &str = "ReactSnap";
 const _STATIC_PATH: &str = "static";
 const IMAGES_PATH: &str = "static/images";
@@ -25,6 +27,7 @@ pub enum Page {
     Home,
     About,
     Skill(String),
+    Employee(String),
     NotFound,
 }
 
@@ -34,6 +37,7 @@ impl Page {
             [] => Self::Home,
             [ABOUT] => Self::About,
             [SKILL, id] => Self::Skill(id.to_string()),
+            [EMPLOYEE, id] => Self::Employee(id.to_string()),
             _ => Self::NotFound,
         }
     }

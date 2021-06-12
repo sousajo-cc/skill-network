@@ -2,80 +2,26 @@ use crate::page::*;
 
 #[derive(Debug)]
 pub enum Msg {
-    SkillLoaded(Skill),
-    EmployeeListLoaded(Vec<Employee>),
+    SkillListLoaded(Vec<Skill>),
     RequestNOK(String),
+    //employename
 }
 
-pub fn init(mut orders: impl Orders<Msg>, id: &str) {
-    document().set_title("Skill");
+pub fn init(mut orders: impl Orders<Msg>, employee_number: &str) {
+    document().set_title("Employee Details");
     scroll_to_top();
-    request_skill(&mut orders, id);
-    request_employees(&mut orders, id);
 }
 
-fn request_skill(orders: &mut impl Orders<Msg>, id: &str) {
-    let url = format!("{}/skill/{}", BACKEND_ADDRESS, id);
-    let request = Request::new(url)
-        .method(Method::Get)
-        .header(Header::custom("Accept-Language", "en"));
-
-    orders.perform_cmd(async {
-        let response = fetch(request).await.expect("HTTP request failed");
-        if response.status().is_ok() {
-            seed::log("request ok!");
-        } else {
-            seed::log("request nok!");
-            let err_msg = response.text().await.unwrap();
-            return Msg::RequestNOK(err_msg);
-        }
-        let skill = response
-            .check_status()
-            .expect("status check failed")
-            .json::<Skill>()
-            .await
-            .expect("deserialization failed");
-        Msg::SkillLoaded(skill)
-    });
-}
-
-fn request_employees(orders: &mut impl Orders<Msg>, id: &str) {
-    let url = format!("{}/list_employees_with_skill/{}", BACKEND_ADDRESS, id);
-    let request = Request::new(url)
-        .method(Method::Get)
-        .header(Header::custom("Accept-Language", "en"));
-
-    orders.perform_cmd(async {
-        let response = fetch(request).await.expect("HTTP request failed");
-        if response.status().is_ok() {
-            seed::log("request ok!");
-        } else {
-            seed::log("request nok!");
-            let err_msg = response.text().await.unwrap();
-            return Msg::RequestNOK(err_msg);
-        }
-        let employee_list = response
-            .check_status()
-            .expect("status check failed")
-            .json::<Vec<Employee>>()
-            .await
-            .expect("deserialization failed");
-        Msg::EmployeeListLoaded(employee_list)
-    });
-}
 
 pub fn update(_orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
     match msg {
-        Msg::SkillLoaded(skill) => {
-            model.skill = Some(skill);
-        },
-        Msg::EmployeeListLoaded(employees) => {
-            model.matched_employees = employees;
-        },
+        Msg::SkillListLoaded(skills) => {
+            model.employee_skills = skills;
+        }
         Msg::RequestNOK(err_msg) => {
-            model.error = Some(err_msg);
-        },
+            model.employee_error = Some(err_msg);
+        }
     }
 }
 
@@ -84,25 +30,32 @@ fn list_employees(model: &Model) -> Vec<Node<Msg>> {
         .matched_employees
         .clone()
         .iter()
-        .map(|employee| {
-            ul![
-                C![C.text_31, C.relative, C.pl_4, C.pr_4,],
-                button![a![
-                    attrs! {
-                            // we should be pointing to this location instead
-                            // At::Href => Urls::new(&model.base_url).employee(&employee.number.to_string())
-                        At::Href => Urls::new(&model.base_url).about()
-                    },
-                    span![employee.name.clone()]
-                ]]
-            ]
-        })
+        .map(
+            |employee| ul![
+                C![
+                    C.text_31,
+                    C.relative,
+                    C.pl_4,
+                    C.pr_4,
+                ],
+                button![
+                    a![
+                        attrs!{
+                            At::Href => Urls::new(&model.base_url).about()
+                        },
+                        span![
+                            employee.name.clone()
+                        ]
+                    ]
+                ]
+            ],
+        )
         .collect()
 }
 pub fn view(model: &Model) -> Node<Msg> {
     match &model.error {
         None => skill_found_view(model),
-        Some(_) => skill_not_found_view(model),
+        Some(_) =>skill_not_found_view(model),
     }
 }
 
@@ -124,7 +77,13 @@ pub fn skill_not_found_view(model: &Model) -> Node<Msg> {
                 C.lg__h_1420px,
             ],
             // Left background
-            div![C![C.absolute, C.left_0, C.inset_y_0, C.w_1of2, C.bg_gray_3,]],
+            div![C![
+                C.absolute,
+                C.left_0,
+                C.inset_y_0,
+                C.w_1of2,
+                C.bg_gray_3,
+            ]],
             div![
                 C![C.relative, C.flex, C.justify_center,],
                 // Main container
@@ -147,6 +106,7 @@ pub fn skill_not_found_view(model: &Model) -> Node<Msg> {
                             C.lg__ml_20,
                             C.lg__w_216,
                         ],
+
                         h1![
                             C![
                                 C.inline,
@@ -160,6 +120,7 @@ pub fn skill_not_found_view(model: &Model) -> Node<Msg> {
                             span!["Skill not found in the "],
                             span![C![C.font_bold], "Database"],
                         ]
+
                     ],
                     div![
                         C![
@@ -178,6 +139,7 @@ pub fn skill_not_found_view(model: &Model) -> Node<Msg> {
             ],
         ],
     ]
+
 }
 
 #[allow(clippy::too_many_lines)]
@@ -198,7 +160,13 @@ pub fn skill_found_view(model: &Model) -> Node<Msg> {
                 C.lg__h_1420px,
             ],
             // Left background
-            div![C![C.absolute, C.left_0, C.inset_y_0, C.w_1of2, C.bg_gray_3,]],
+            div![C![
+                C.absolute,
+                C.left_0,
+                C.inset_y_0,
+                C.w_1of2,
+                C.bg_gray_3,
+            ]],
             div![
                 C![C.relative, C.flex, C.justify_center,],
                 // Main container
@@ -222,8 +190,12 @@ pub fn skill_found_view(model: &Model) -> Node<Msg> {
                             C.lg__w_216,
                         ],
                         match &model.skill {
-                            None => div![span!["Loading..."]],
-                            Some(skill) => h1![
+                            None =>
+                                div![
+                                    span!["Loading..."]
+                                ],
+                            Some(skill) =>
+                            h1![
                                 C![
                                     C.inline,
                                     C.leading_tight,
@@ -235,7 +207,7 @@ pub fn skill_found_view(model: &Model) -> Node<Msg> {
                                 ],
                                 span!["People that know "],
                                 span![C![C.font_bold], &skill.skill],
-                            ],
+                            ]
                         }
                     ],
                     div![
@@ -255,4 +227,5 @@ pub fn skill_found_view(model: &Model) -> Node<Msg> {
             ],
         ],
     ]
+
 }

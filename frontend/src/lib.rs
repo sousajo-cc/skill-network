@@ -27,6 +27,7 @@ pub enum Msg {
     Home(page::home::Msg),
     About(page::about::Msg),
     Skill(page::skill::Msg),
+    Employee(page::employee::Msg),
     NotFound(page::not_found::Msg),
     Header(page::partial::header::Msg),
     Footer(page::partial::footer::Msg),
@@ -40,6 +41,7 @@ fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
         Page::Home => page::home::init(orders.proxy(Msg::Home)),
         Page::About => page::about::init(orders.proxy(Msg::About)),
         Page::Skill(id) => page::skill::init(orders.proxy(Msg::Skill), id),
+        Page::Employee(id) => page::skill::init(orders.proxy(Msg::Skill), id),
         Page::NotFound => page::not_found::init(orders.proxy(Msg::NotFound)),
     }
     model
