@@ -37,7 +37,12 @@ fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
     orders.subscribe(Msg::UrlChanged);
 
     let model = Model::new(url);
-    match &model.page {
+    let inner_model = match &model {
+        Model::Home(m) => m,
+        Model::Skill(m) => m,
+        Model::Employee(m) => m,
+    };
+    match &inner_model.page {
         Page::Home => page::home::init(orders.proxy(Msg::Home)),
         Page::About => page::about::init(orders.proxy(Msg::About)),
         Page::Skill(id) => page::skill::init(orders.proxy(Msg::Skill), id),
@@ -55,21 +60,42 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
             *model = init(url, orders);
         },
         Msg::Home(inner_msg) => {
-            page::home::update(&mut orders.proxy(Msg::Home), model, inner_msg)
+            if let Model::Home(inner_model) = model {
+                page::home::update(
+                    &mut orders.proxy(Msg::Home),
+                    inner_model,
+                    inner_msg,
+                );
+            }
         },
         Msg::Skill(inner_msg) => {
-            page::skill::update(&mut orders.proxy(Msg::Skill), model, inner_msg)
+            if let Model::Skill(inner_model) = model {
+                page::skill::update(
+                    &mut orders.proxy(Msg::Skill),
+                    inner_model,
+                    inner_msg,
+                );
+            }
         },
-        Msg::Employee(inner_msg) => page::employee::update(
-            &mut orders.proxy(Msg::Employee),
-            model,
-            inner_msg,
-        ),
+        Msg::Employee(inner_msg) => {
+            if let Model::Employee(inner_model) = model {
+                page::employee::update(
+                    &mut orders.proxy(Msg::Employee),
+                    inner_model,
+                    inner_msg,
+                );
+            }
+        },
         _ => unimplemented!(),
     }
 }
 
 pub fn view(model: &Model) -> impl IntoNodes<Msg> {
+    let model = match model {
+        Model::Home(m) => m,
+        Model::Skill(m) => m,
+        Model::Employee(m) => m,
+    };
     div![
         C![
             IF!(not(model.in_prerendering) => C.fade_in),

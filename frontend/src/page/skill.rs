@@ -64,7 +64,11 @@ fn request_employees(orders: &mut impl Orders<Msg>, id: &str) {
     });
 }
 
-pub fn update(_orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
+pub fn update(
+    _orders: &mut impl Orders<Msg>,
+    model: &mut InnerModel,
+    msg: Msg,
+) {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
     match msg {
         Msg::SkillLoaded(skill) => {
@@ -79,7 +83,7 @@ pub fn update(_orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
     }
 }
 
-fn list_employees(model: &Model) -> Vec<Node<Msg>> {
+fn list_employees(model: &InnerModel) -> Vec<Node<Msg>> {
     model
         .matched_employees
         .clone()
@@ -98,7 +102,7 @@ fn list_employees(model: &Model) -> Vec<Node<Msg>> {
         .collect()
 }
 
-pub fn view(model: &Model) -> Node<Msg> {
+pub fn view(model: &InnerModel) -> Node<Msg> {
     match &model.error {
         None => skill_found_view(model),
         Some(_) => skill_not_found_view(model),
@@ -106,7 +110,7 @@ pub fn view(model: &Model) -> Node<Msg> {
 }
 
 #[allow(clippy::too_many_lines)]
-pub fn skill_not_found_view(model: &Model) -> Node<Msg> {
+pub fn skill_not_found_view(model: &InnerModel) -> Node<Msg> {
     if !model.matched_employees.is_empty() {
         seed::log(&model.matched_employees[0].name);
     }
@@ -180,7 +184,7 @@ pub fn skill_not_found_view(model: &Model) -> Node<Msg> {
 }
 
 #[allow(clippy::too_many_lines)]
-pub fn skill_found_view(model: &Model) -> Node<Msg> {
+pub fn skill_found_view(model: &InnerModel) -> Node<Msg> {
     if !model.matched_employees.is_empty() {
         seed::log(&model.matched_employees[0].name);
     }

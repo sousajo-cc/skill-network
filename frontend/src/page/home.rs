@@ -15,7 +15,7 @@ pub fn init(mut orders: impl Orders<Msg>) {
     orders.stream(streams::window_event(Ev::Scroll, |_| Msg::Scrolled));
 }
 
-pub fn generate_skill_list(model: &Model) -> Vec<Node<Msg>> {
+pub fn generate_skill_list(model: &InnerModel) -> Vec<Node<Msg>> {
     seed::log("matched skills:");
     seed::log(model.matched_skills.clone());
 
@@ -44,7 +44,7 @@ pub fn generate_skill_list(model: &Model) -> Vec<Node<Msg>> {
         .collect()
 }
 
-pub fn update(orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
+pub fn update(orders: &mut impl Orders<Msg>, model: &mut InnerModel, msg: Msg) {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
     match msg {
         Msg::ScrollToTop => window().scroll_to_with_scroll_to_options(
@@ -102,7 +102,7 @@ pub fn update(orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
 }
 
 #[allow(clippy::too_many_lines)]
-pub fn view(model: &Model) -> Node<Msg> {
+pub fn view(model: &InnerModel) -> Node<Msg> {
     if !model.matched_skills.is_empty() {
         seed::log(&model.matched_skills[0].skill);
     }

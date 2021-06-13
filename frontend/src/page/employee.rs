@@ -64,7 +64,11 @@ fn request_skills(orders: &mut impl Orders<Msg>, id: &str) {
     });
 }
 
-pub fn update(_orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
+pub fn update(
+    _orders: &mut impl Orders<Msg>,
+    model: &mut InnerModel,
+    msg: Msg,
+) {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
     match msg {
         Msg::EmployeeLoaded(employee) => {
@@ -79,7 +83,7 @@ pub fn update(_orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
     }
 }
 
-fn list_skills(model: &Model) -> Vec<Node<Msg>> {
+fn list_skills(model: &InnerModel) -> Vec<Node<Msg>> {
     model
         .employee_skills
         .clone()
@@ -107,7 +111,7 @@ fn list_skills(model: &Model) -> Vec<Node<Msg>> {
         .collect()
 }
 
-pub fn view(model: &Model) -> Node<Msg> {
+pub fn view(model: &InnerModel) -> Node<Msg> {
     match &model.error {
         None => employee_found_view(model),
         Some(_) => employee_not_found_view(model),
@@ -115,7 +119,7 @@ pub fn view(model: &Model) -> Node<Msg> {
 }
 
 #[allow(clippy::too_many_lines)]
-pub fn employee_not_found_view(model: &Model) -> Node<Msg> {
+pub fn employee_not_found_view(model: &InnerModel) -> Node<Msg> {
     div![
         C![C.flex_grow,],
         // Main section
@@ -185,7 +189,7 @@ pub fn employee_not_found_view(model: &Model) -> Node<Msg> {
 }
 
 #[allow(clippy::too_many_lines)]
-pub fn employee_found_view(model: &Model) -> Node<Msg> {
+pub fn employee_found_view(model: &InnerModel) -> Node<Msg> {
     div![
         C![C.flex_grow,],
         // Main section

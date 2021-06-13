@@ -1,7 +1,24 @@
 use crate::page::*;
 
-// TODO: separate into a model for each page
-pub struct Model {
+pub enum Model {
+    Home(InnerModel),
+    Skill(InnerModel),
+    Employee(InnerModel),
+}
+
+impl Model {
+    pub fn new(url: Url) -> Model {
+        let inner_model = InnerModel::new(url);
+        match &inner_model.page {
+            Page::Home => Model::Home(inner_model),
+            Page::Skill(_) => Model::Skill(inner_model),
+            Page::Employee(_) => Model::Employee(inner_model),
+            _ => unimplemented!(),
+        }
+    }
+}
+
+pub struct InnerModel {
     pub base_url: Url,
     pub page: Page,
     pub scroll_history: ScrollHistory,
@@ -20,9 +37,9 @@ pub struct Model {
     pub error_employee: Option<String>,
 }
 
-impl Model {
+impl InnerModel {
     pub fn new(url: Url) -> Self {
-        Model {
+        InnerModel {
             base_url: url.to_base_url(),
             page: Page::new(url),
             scroll_history: ScrollHistory::new(),
