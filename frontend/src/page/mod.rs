@@ -49,12 +49,16 @@ impl<'a> Urls<'a> {
         self.base_url()
     }
 
-    pub fn about(self) -> Url {
+    pub fn _about(self) -> Url {
         self.base_url().add_path_part(ABOUT)
     }
 
     pub fn skill(self, id: &str) -> Url {
         self.base_url().add_path_part(SKILL).add_path_part(id)
+    }
+
+    pub fn employee(self, id: &str) -> Url {
+        self.base_url().add_path_part(EMPLOYEE).add_path_part(id)
     }
 }
 

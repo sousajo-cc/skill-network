@@ -89,9 +89,7 @@ fn list_employees(model: &Model) -> Vec<Node<Msg>> {
                 C![C.text_31, C.relative, C.pl_4, C.pr_4,],
                 button![a![
                     attrs! {
-                            // we should be pointing to this location instead
-                            // At::Href => Urls::new(&model.base_url).employee(&employee.number.to_string())
-                        At::Href => Urls::new(&model.base_url).about()
+                        At::Href => Urls::new(&model.base_url).employee(&employee.employee_number)
                     },
                     span![employee.name.clone()]
                 ]]

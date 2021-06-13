@@ -11,7 +11,7 @@ pub fn init(mut orders: impl Orders<Msg>, employee_id: &str) {
     document().set_title("Employee Details");
     scroll_to_top();
     request_employee(&mut orders, employee_id);
-    //request_skills(&mut orders, employee_id);
+    request_skills(&mut orders, employee_id);
 }
 
 fn request_employee(orders: &mut impl Orders<Msg>, id: &str) {
@@ -39,6 +39,31 @@ fn request_employee(orders: &mut impl Orders<Msg>, id: &str) {
     });
 }
 
+fn request_skills(orders: &mut impl Orders<Msg>, id: &str) {
+    let url = format!("{}/list_skills_for_employee/{}", BACKEND_ADDRESS, id);
+    let request = Request::new(url)
+        .method(Method::Get)
+        .header(Header::custom("Accept-Language", "en"));
+
+    orders.perform_cmd(async {
+        let response = fetch(request).await.expect("HTTP request failed");
+        if response.status().is_ok() {
+            seed::log("request ok!");
+        } else {
+            seed::log("request nok!");
+            let err_msg = response.text().await.unwrap();
+            return Msg::RequestNOK(err_msg);
+        }
+        let skill_list = response
+            .check_status()
+            .expect("status check failed")
+            .json::<Vec<Skill>>()
+            .await
+            .expect("deserialization failed");
+        Msg::SkillListLoaded(skill_list)
+    });
+}
+
 pub fn update(_orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
     match msg {
@@ -56,7 +81,7 @@ pub fn update(_orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
 
 fn list_skills(model: &Model) -> Vec<Node<Msg>> {
     model
-        .matched_employees
+        .employee_skills
         .clone()
         .iter()
         .map(
@@ -70,10 +95,10 @@ fn list_skills(model: &Model) -> Vec<Node<Msg>> {
                 button![
                     a![
                         attrs!{
-                            At::Href => Urls::new(&model.base_url).about()
+                            At::Href => Urls::new(&model.base_url).skill(&skill.id.to_string())
                         },
                         span![
-                            skill.name.clone()
+                            skill.skill.clone()
                         ]
                     ]
                 ]
