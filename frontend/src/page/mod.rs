@@ -1,11 +1,11 @@
 pub mod common;
 
 pub mod about;
+pub mod employee;
 pub mod home;
 pub mod not_found;
 pub mod partial;
 pub mod skill;
-pub mod employee;
 
 use crate::generated::css_classes::C;
 pub use common::*;

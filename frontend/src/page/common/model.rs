@@ -14,7 +14,7 @@ pub struct Model {
     pub skill: Option<Skill>,
     pub matched_employees: Vec<Employee>,
     pub error: Option<String>,
-    //employee page
+    // employee page
     pub employee: Option<Employee>,
     pub employee_skills: Vec<Skill>,
     pub error_employee: Option<String>,

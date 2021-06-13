@@ -41,7 +41,9 @@ fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
         Page::Home => page::home::init(orders.proxy(Msg::Home)),
         Page::About => page::about::init(orders.proxy(Msg::About)),
         Page::Skill(id) => page::skill::init(orders.proxy(Msg::Skill), id),
-        Page::Employee(id) => page::employee::init(orders.proxy(Msg::Employee), id),
+        Page::Employee(id) => {
+            page::employee::init(orders.proxy(Msg::Employee), id)
+        },
         Page::NotFound => page::not_found::init(orders.proxy(Msg::NotFound)),
     }
     model
@@ -58,9 +60,11 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
         Msg::Skill(inner_msg) => {
             page::skill::update(&mut orders.proxy(Msg::Skill), model, inner_msg)
         },
-        Msg::Employee(inner_msg) => {
-            page::employee::update(&mut orders.proxy(Msg::Employee), model, inner_msg)
-        },
+        Msg::Employee(inner_msg) => page::employee::update(
+            &mut orders.proxy(Msg::Employee),
+            model,
+            inner_msg,
+        ),
         _ => unimplemented!(),
     }
 }
@@ -77,7 +81,8 @@ pub fn view(model: &Model) -> impl IntoNodes<Msg> {
             Page::Home => page::home::view(model).map_msg(Msg::Home),
             Page::About => page::about::view().map_msg(Msg::About),
             Page::Skill(_) => page::skill::view(model).map_msg(Msg::Skill),
-            Page::Employee(_) => page::employee::view(model).map_msg(Msg::Employee),
+            Page::Employee(_) =>
+                page::employee::view(model).map_msg(Msg::Employee),
             Page::NotFound => page::not_found::view().map_msg(Msg::NotFound),
         },
         page::partial::header::view(model).map_msg(Msg::Header),

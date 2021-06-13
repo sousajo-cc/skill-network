@@ -69,13 +69,13 @@ pub fn update(_orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
     match msg {
         Msg::EmployeeLoaded(employee) => {
             model.employee = Some(employee);
-        }
+        },
         Msg::SkillListLoaded(skills) => {
             model.employee_skills = skills;
-        }
+        },
         Msg::RequestNOK(err_msg) => {
             model.error_employee = Some(err_msg);
-        }
+        },
     }
 }
 
@@ -128,13 +128,7 @@ pub fn employee_not_found_view(model: &Model) -> Node<Msg> {
                 C.lg__h_1420px,
             ],
             // Left background
-            div![C![
-                C.absolute,
-                C.left_0,
-                C.inset_y_0,
-                C.w_1of2,
-                C.bg_gray_3,
-            ]],
+            div![C![C.absolute, C.left_0, C.inset_y_0, C.w_1of2, C.bg_gray_3,]],
             div![
                 C![C.relative, C.flex, C.justify_center,],
                 // Main container
@@ -157,7 +151,6 @@ pub fn employee_not_found_view(model: &Model) -> Node<Msg> {
                             C.lg__ml_20,
                             C.lg__w_216,
                         ],
-
                         h1![
                             C![
                                 C.inline,
@@ -171,7 +164,6 @@ pub fn employee_not_found_view(model: &Model) -> Node<Msg> {
                             span!["Skill not found in the "],
                             span![C![C.font_bold], "Database"],
                         ]
-
                     ],
                     div![
                         C![
@@ -190,7 +182,6 @@ pub fn employee_not_found_view(model: &Model) -> Node<Msg> {
             ],
         ],
     ]
-
 }
 
 #[allow(clippy::too_many_lines)]
@@ -207,13 +198,7 @@ pub fn employee_found_view(model: &Model) -> Node<Msg> {
                 C.lg__h_1420px,
             ],
             // Left background
-            div![C![
-                C.absolute,
-                C.left_0,
-                C.inset_y_0,
-                C.w_1of2,
-                C.bg_gray_3,
-            ]],
+            div![C![C.absolute, C.left_0, C.inset_y_0, C.w_1of2, C.bg_gray_3,]],
             div![
                 C![C.relative, C.flex, C.justify_center,],
                 // Main container
@@ -237,12 +222,8 @@ pub fn employee_found_view(model: &Model) -> Node<Msg> {
                             C.lg__w_216,
                         ],
                         match &model.employee {
-                            None =>
-                                div![
-                                    span!["Loading..."]
-                                ],
-                            Some(employee) =>
-                            h1![
+                            None => div![span!["Loading..."]],
+                            Some(employee) => h1![
                                 C![
                                     C.inline,
                                     C.leading_tight,
@@ -253,7 +234,7 @@ pub fn employee_found_view(model: &Model) -> Node<Msg> {
                                     C.lg__text_120,
                                 ],
                                 span![C![C.font_bold], &employee.name],
-                            ]
+                            ],
                         }
                     ],
                     div![
@@ -273,5 +254,4 @@ pub fn employee_found_view(model: &Model) -> Node<Msg> {
             ],
         ],
     ]
-
 }
