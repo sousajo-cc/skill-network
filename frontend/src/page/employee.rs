@@ -2,20 +2,49 @@ use crate::page::*;
 
 #[derive(Debug)]
 pub enum Msg {
+    EmployeeLoaded(Employee),
     SkillListLoaded(Vec<Skill>),
     RequestNOK(String),
-    //employename
 }
 
-pub fn init(mut _orders: impl Orders<Msg>, _employee_number: &str) {
+pub fn init(mut orders: impl Orders<Msg>, employee_id: &str) {
     document().set_title("Employee Details");
     scroll_to_top();
+    request_employee(&mut orders, employee_id);
+    //request_skills(&mut orders, employee_id);
 }
 
+fn request_employee(orders: &mut impl Orders<Msg>, id: &str) {
+    let url = format!("{}/employee/{}", BACKEND_ADDRESS, id);
+    let request = Request::new(url)
+        .method(Method::Get)
+        .header(Header::custom("Accept-Language", "en"));
+
+    orders.perform_cmd(async {
+        let response = fetch(request).await.expect("HTTP request failed");
+        if response.status().is_ok() {
+            seed::log("request ok!");
+        } else {
+            seed::log("request nok!");
+            let err_msg = response.text().await.unwrap();
+            return Msg::RequestNOK(err_msg);
+        }
+        let employee = response
+            .check_status()
+            .expect("status check failed")
+            .json::<Employee>()
+            .await
+            .expect("deserialization failed");
+        Msg::EmployeeLoaded(employee)
+    });
+}
 
 pub fn update(_orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
     match msg {
+        Msg::EmployeeLoaded(employee) => {
+            model.employee = Some(employee);
+        }
         Msg::SkillListLoaded(skills) => {
             model.employee_skills = skills;
         }
@@ -25,13 +54,13 @@ pub fn update(_orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
     }
 }
 
-fn list_employees(model: &Model) -> Vec<Node<Msg>> {
+fn list_skills(model: &Model) -> Vec<Node<Msg>> {
     model
         .matched_employees
         .clone()
         .iter()
         .map(
-            |employee| ul![
+            |skill| ul![
                 C![
                     C.text_31,
                     C.relative,
@@ -44,7 +73,7 @@ fn list_employees(model: &Model) -> Vec<Node<Msg>> {
                             At::Href => Urls::new(&model.base_url).about()
                         },
                         span![
-                            employee.name.clone()
+                            skill.name.clone()
                         ]
                     ]
                 ]
@@ -55,17 +84,13 @@ fn list_employees(model: &Model) -> Vec<Node<Msg>> {
 
 pub fn view(model: &Model) -> Node<Msg> {
     match &model.error {
-        None => skill_found_view(model),
-        Some(_) => skill_not_found_view(model),
+        None => employee_found_view(model),
+        Some(_) => employee_not_found_view(model),
     }
 }
 
 #[allow(clippy::too_many_lines)]
-pub fn skill_not_found_view(model: &Model) -> Node<Msg> {
-    if !model.matched_employees.is_empty() {
-        seed::log(&model.matched_employees[0].name);
-    }
-
+pub fn employee_not_found_view(model: &Model) -> Node<Msg> {
     div![
         C![C.flex_grow,],
         // Main section
@@ -134,7 +159,7 @@ pub fn skill_not_found_view(model: &Model) -> Node<Msg> {
                             C.mb_6,
                             C.lg__pt_0,
                         ],
-                        div![nodes!(list_employees(model))]
+                        div![nodes!(list_skills(model))]
                     ]
                 ],
             ],
@@ -144,11 +169,7 @@ pub fn skill_not_found_view(model: &Model) -> Node<Msg> {
 }
 
 #[allow(clippy::too_many_lines)]
-pub fn skill_found_view(model: &Model) -> Node<Msg> {
-    if !model.matched_employees.is_empty() {
-        seed::log(&model.matched_employees[0].name);
-    }
-
+pub fn employee_found_view(model: &Model) -> Node<Msg> {
     div![
         C![C.flex_grow,],
         // Main section
@@ -190,12 +211,12 @@ pub fn skill_found_view(model: &Model) -> Node<Msg> {
                             C.lg__ml_20,
                             C.lg__w_216,
                         ],
-                        match &model.skill {
+                        match &model.employee {
                             None =>
                                 div![
                                     span!["Loading..."]
                                 ],
-                            Some(skill) =>
+                            Some(employee) =>
                             h1![
                                 C![
                                     C.inline,
@@ -206,8 +227,7 @@ pub fn skill_found_view(model: &Model) -> Node<Msg> {
                                     C.lg__leading_none,
                                     C.lg__text_120,
                                 ],
-                                span!["People that know "],
-                                span![C![C.font_bold], &skill.skill],
+                                span![C![C.font_bold], &employee.name],
                             ]
                         }
                     ],
@@ -222,7 +242,7 @@ pub fn skill_found_view(model: &Model) -> Node<Msg> {
                             C.mb_6,
                             C.lg__pt_0,
                         ],
-                        div![nodes!(list_employees(model))]
+                        div![nodes!(list_skills(model))]
                     ]
                 ],
             ],

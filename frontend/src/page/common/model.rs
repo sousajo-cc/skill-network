@@ -15,6 +15,7 @@ pub struct Model {
     pub matched_employees: Vec<Employee>,
     pub error: Option<String>,
     //employee page
+    pub employee: Option<Employee>,
     pub employee_skills: Vec<Skill>,
     pub error_employee: Option<String>,
 }
@@ -32,6 +33,7 @@ impl Model {
             skill: None,
             matched_employees: Vec::new(),
             error: None,
+            employee: None,
             employee_skills: Vec::new(),
             error_employee: None,
         }
