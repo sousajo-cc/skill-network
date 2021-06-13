@@ -7,7 +7,7 @@ pub enum Msg {
     //employename
 }
 
-pub fn init(mut orders: impl Orders<Msg>, employee_number: &str) {
+pub fn init(mut _orders: impl Orders<Msg>, _employee_number: &str) {
     document().set_title("Employee Details");
     scroll_to_top();
 }
@@ -20,7 +20,7 @@ pub fn update(_orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
             model.employee_skills = skills;
         }
         Msg::RequestNOK(err_msg) => {
-            model.employee_error = Some(err_msg);
+            model.error_employee = Some(err_msg);
         }
     }
 }
@@ -52,10 +52,11 @@ fn list_employees(model: &Model) -> Vec<Node<Msg>> {
         )
         .collect()
 }
+
 pub fn view(model: &Model) -> Node<Msg> {
     match &model.error {
         None => skill_found_view(model),
-        Some(_) =>skill_not_found_view(model),
+        Some(_) => skill_not_found_view(model),
     }
 }
 

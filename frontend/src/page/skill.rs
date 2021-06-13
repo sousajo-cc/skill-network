@@ -99,6 +99,7 @@ fn list_employees(model: &Model) -> Vec<Node<Msg>> {
         })
         .collect()
 }
+
 pub fn view(model: &Model) -> Node<Msg> {
     match &model.error {
         None => skill_found_view(model),
