@@ -12,11 +12,19 @@ jobs:
       script:
         - rustup component add clippy
         - cargo +nightly clippy
+    - stage: fmt backend
+      before_script: cd backend/
+      script:
+        - cargo +nightly fmt
     - stage: clippy frontend
       before_script: cd frontend/
       script:
         - rustup component add clippy
         - cargo +nightly clippy
+    - stage: fmt frontend
+      before_script: cd frontend/
+      script:
+        - cargo +nightly fmt
     - stage: backend
       before_script: cd backend/ 
       script: cargo +nightly build
@@ -25,7 +33,9 @@ jobs:
 
 stages:
   - clippy backend
+  - fmt backend
   - clippy frontend
+  - fmt frontend
   - backend
   - frontend
 
