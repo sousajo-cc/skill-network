@@ -15,6 +15,7 @@ jobs:
     - stage: fmt backend
       before_script: cd backend/
       script:
+        - rustup component add rustfmt
         - cargo +nightly fmt
     - stage: clippy frontend
       before_script: cd frontend/
@@ -24,6 +25,7 @@ jobs:
     - stage: fmt frontend
       before_script: cd frontend/
       script:
+        - rustup component add rustfmt
         - cargo +nightly fmt
     - stage: backend
       before_script: cd backend/ 
