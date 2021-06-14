@@ -1,6 +1,7 @@
 pub mod common;
 
 pub mod about;
+pub mod employee;
 pub mod home;
 pub mod not_found;
 pub mod partial;
@@ -14,6 +15,7 @@ use seed::{prelude::*, *};
 const TITLE_SUFFIX: &str = "Company";
 const ABOUT: &str = "about";
 const SKILL: &str = "skill";
+const EMPLOYEE: &str = "employee";
 const USER_AGENT_FOR_PRERENDERING: &str = "ReactSnap";
 const _STATIC_PATH: &str = "static";
 const IMAGES_PATH: &str = "static/images";
@@ -25,6 +27,7 @@ pub enum Page {
     Home,
     About,
     Skill(String),
+    Employee(String),
     NotFound,
 }
 
@@ -34,6 +37,7 @@ impl Page {
             [] => Self::Home,
             [ABOUT] => Self::About,
             [SKILL, id] => Self::Skill(id.to_string()),
+            [EMPLOYEE, id] => Self::Employee(id.to_string()),
             _ => Self::NotFound,
         }
     }
@@ -45,12 +49,16 @@ impl<'a> Urls<'a> {
         self.base_url()
     }
 
-    pub fn about(self) -> Url {
+    pub fn _about(self) -> Url {
         self.base_url().add_path_part(ABOUT)
     }
 
     pub fn skill(self, id: &str) -> Url {
         self.base_url().add_path_part(SKILL).add_path_part(id)
+    }
+
+    pub fn employee(self, id: &str) -> Url {
+        self.base_url().add_path_part(EMPLOYEE).add_path_part(id)
     }
 }
 

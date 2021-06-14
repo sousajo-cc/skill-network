@@ -24,7 +24,7 @@ fn get_by_id(id: i32) -> Result<Json<EmployeesSkill>, BackendError> {
 
 #[get("/list_employees_with_skill/<skill>")]
 fn list_employees_with_skill(skill: i32) -> Result<Json<Vec<Employee>>, BackendError> {
-    use diesel::QueryResult; //TODO: use our own error types so we don't have the outter api dependending on diesel
+    use diesel::QueryResult; //TODO: use our own error types so we don't have the outer api dependending on diesel
 
     let connection = establish_connection();
     let skill = Skill::find(&connection, skill)?;
@@ -33,6 +33,19 @@ fn list_employees_with_skill(skill: i32) -> Result<Json<Vec<Employee>>, BackendE
         .map(|relation| Employee::find(&connection, &relation.employee_number))
         .collect::<QueryResult<Vec<Employee>>>()?;
     Ok(Json(employees))
+}
+
+#[get("/list_skills_for_employee/<employee>")]
+fn list_skills_for_employee(employee: String) -> Result<Json<Vec<Skill>>, BackendError> {
+    use diesel::QueryResult; //TODO: use our own error types so we don't have the outer api dependending on diesel
+
+    let connection = establish_connection();
+    let employee = Employee::find(&connection, &employee)?;
+    let skills = EmployeesSkill::filter_by_employee(&connection, employee)?
+        .into_iter()
+        .map(|relation| Skill::find(&connection, relation.skill_id))
+        .collect::<QueryResult<Vec<Skill>>>()?;
+    Ok(Json(skills))
 }
 
 #[get("/?search&<skill>&<name>&<employeenumber>")]
@@ -113,6 +126,7 @@ impl EmployeeSkillApi for Rocket {
                 get_all,
                 get_by_id,
                 list_employees_with_skill,
+                list_skills_for_employee,
                 search,
                 insert,
                 insert_batch,
