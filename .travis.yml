@@ -7,25 +7,36 @@ services:
 
 jobs:
   include:
-    - stage: clippy backend
-      before_script: cd backend/
+    - stage: install components
       script:
         - rustup component add clippy
+        - rustup component add rustfmt
+      workspaces:
+        create:
+          name: static_analysis_ws
+    - stage: clippy backend
+      workspaces:
+        use: static_analysis_ws
+      before_script: cd backend/
+      script:
         - cargo +nightly clippy
     - stage: fmt backend
+      workspaces:
+        use: static_analysis_ws
       before_script: cd backend/
       script:
-        - rustup component add rustfmt
         - cargo +nightly fmt
     - stage: clippy frontend
+      workspaces:
+        use: static_analysis_ws
       before_script: cd frontend/
       script:
-        - rustup component add clippy
         - cargo +nightly clippy
     - stage: fmt frontend
+      workspaces:
+        use: static_analysis_ws
       before_script: cd frontend/
       script:
-        - rustup component add rustfmt
         - cargo +nightly fmt
     - stage: backend
       before_script: cd backend/ 
@@ -34,6 +45,7 @@ jobs:
       script: docker-compose build 
 
 stages:
+  - install components
   - clippy backend
   - fmt backend
   - clippy frontend
