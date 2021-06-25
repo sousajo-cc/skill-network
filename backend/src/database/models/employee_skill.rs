@@ -3,7 +3,8 @@ use crate::database::models::skill::Skill;
 use crate::database::models::tables::employee_skill::*;
 use crate::result::BackendError;
 use diesel::prelude::*;
-use diesel::{RunQueryDsl, SqliteConnection};
+use diesel::RunQueryDsl;
+use crate::LogsDbConn;
 
 #[derive(Queryable, Serialize, Identifiable, Associations, Clone, Debug)]
 #[belongs_to(Employee, foreign_key = "employee_number")]
@@ -15,46 +16,46 @@ pub struct EmployeesSkill {
 }
 
 impl EmployeesSkill {
-    pub fn list(conn: &SqliteConnection) -> QueryResult<Vec<EmployeesSkill>> {
+    pub fn list(conn: &LogsDbConn) -> QueryResult<Vec<EmployeesSkill>> {
         employees_skills_table.load::<EmployeesSkill>(conn)
     }
 
-    pub fn find(conn: &SqliteConnection, employee_skill_id: i32) -> QueryResult<EmployeesSkill> {
+    pub fn find(conn: &LogsDbConn, employee_skill_id: i32) -> QueryResult<EmployeesSkill> {
         employees_skills_table
             .filter(id.eq(employee_skill_id))
             .get_result::<EmployeesSkill>(conn)
     }
 
     pub fn filter_by_employee(
-        conn: &SqliteConnection,
+        conn: &LogsDbConn,
         employee: Employee,
     ) -> QueryResult<Vec<EmployeesSkill>> {
         EmployeesSkill::belonging_to(&employee).load::<EmployeesSkill>(conn)
     }
 
     pub fn filter_by_employees(
-        conn: &SqliteConnection,
+        conn: &LogsDbConn,
         employees: Vec<Employee>,
     ) -> QueryResult<Vec<EmployeesSkill>> {
         EmployeesSkill::belonging_to(&employees).load::<EmployeesSkill>(conn)
     }
 
     pub fn filter_by_skill(
-        conn: &SqliteConnection,
+        conn: &LogsDbConn,
         skill: Skill,
     ) -> QueryResult<Vec<EmployeesSkill>> {
         EmployeesSkill::belonging_to(&skill).load::<EmployeesSkill>(conn)
     }
 
     pub fn filter_by_skills(
-        conn: &SqliteConnection,
+        conn: &LogsDbConn,
         skills: Vec<Skill>,
     ) -> QueryResult<Vec<EmployeesSkill>> {
         EmployeesSkill::belonging_to(&skills).load::<EmployeesSkill>(conn)
     }
 
     pub fn filter(
-        conn: &SqliteConnection,
+        conn: &LogsDbConn,
         employees: Vec<Employee>,
         skills: Vec<Skill>,
     ) -> QueryResult<Vec<EmployeesSkill>> {
@@ -73,14 +74,14 @@ pub struct NewEmployeesSkill {
 }
 
 impl NewEmployeesSkill {
-    pub fn insert(self, conn: &SqliteConnection) -> QueryResult<usize> {
+    pub fn insert(self, conn: &LogsDbConn) -> QueryResult<usize> {
         diesel::insert_into(employees_skills_table)
             .values(self)
             .execute(conn)
     }
 
     pub fn insert_batch(
-        conn: &SqliteConnection,
+        conn: &LogsDbConn,
         values: Vec<NewEmployeesSkill>,
     ) -> QueryResult<usize> {
         diesel::insert_into(employees_skills_table)

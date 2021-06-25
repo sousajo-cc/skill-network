@@ -12,6 +12,9 @@ use dotenv::dotenv;
 use result::BackendError;
 use rocket_cors::{AllowedHeaders, AllowedOrigins, Error};
 
+#[database("sqlite_logs")]
+struct LogsDbConn(diesel::SqliteConnection);
+
 extern crate dotenv;
 #[macro_use]
 extern crate rocket;
@@ -19,6 +22,8 @@ extern crate rocket;
 extern crate diesel;
 #[macro_use]
 extern crate serde_derive;
+#[macro_use] 
+extern crate rocket_contrib;
 
 pub fn employee_skill_example() -> Result<(), BackendError> {
     dotenv().ok();
@@ -164,6 +169,7 @@ pub fn main() -> Result<(), Error> {
         .mount_skill_api("/skill")
         .mount_employee_skill_api("/")
         .attach(cors)
+        .attach(LogsDbConn::fairing())
         .launch();
     Ok(())
 }
