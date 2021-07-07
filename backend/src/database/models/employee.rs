@@ -13,13 +13,13 @@ pub struct Employee {
 
 impl Employee {
     pub fn list(conn: &LogsDbConn) -> QueryResult<Vec<Employee>> {
-        employees_table.load::<Employee>(conn)
+        employees_table.load::<Employee>(&conn.0)
     }
 
     pub fn find(conn: &LogsDbConn, employeenumber: &str) -> QueryResult<Employee> {
         employees_table
             .filter(employee_number.eq(employeenumber))
-            .get_result::<Employee>(conn)
+            .get_result::<Employee>(&conn.0)
     }
 
     #[allow(clippy::ptr_arg)]
@@ -28,18 +28,18 @@ impl Employee {
         let employee_name = format!("%{}%", employee_name);
         employees_table
             .filter(name.like(employee_name))
-            .load::<Employee>(conn)
+            .load::<Employee>(&conn.0)
     }
 
     pub fn insert(self, conn: &LogsDbConn) -> QueryResult<usize> {
         diesel::insert_into(employees_table)
             .values(self)
-            .execute(conn)
+            .execute(&conn.0)
     }
 
     pub fn insert_batch(conn: &LogsDbConn, values: Vec<Employee>) -> QueryResult<usize> {
         diesel::insert_into(employees_table)
             .values(values)
-            .execute(conn)
+            .execute(&*conn.0)
     }
 }

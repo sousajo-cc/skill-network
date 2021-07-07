@@ -17,41 +17,41 @@ pub struct EmployeesSkill {
 
 impl EmployeesSkill {
     pub fn list(conn: &LogsDbConn) -> QueryResult<Vec<EmployeesSkill>> {
-        employees_skills_table.load::<EmployeesSkill>(conn)
+        employees_skills_table.load::<EmployeesSkill>(&conn.0)
     }
 
     pub fn find(conn: &LogsDbConn, employee_skill_id: i32) -> QueryResult<EmployeesSkill> {
         employees_skills_table
             .filter(id.eq(employee_skill_id))
-            .get_result::<EmployeesSkill>(conn)
+            .get_result::<EmployeesSkill>(&conn.0)
     }
 
     pub fn filter_by_employee(
         conn: &LogsDbConn,
         employee: Employee,
     ) -> QueryResult<Vec<EmployeesSkill>> {
-        EmployeesSkill::belonging_to(&employee).load::<EmployeesSkill>(conn)
+        EmployeesSkill::belonging_to(&employee).load::<EmployeesSkill>(&conn.0)
     }
 
     pub fn filter_by_employees(
         conn: &LogsDbConn,
         employees: Vec<Employee>,
     ) -> QueryResult<Vec<EmployeesSkill>> {
-        EmployeesSkill::belonging_to(&employees).load::<EmployeesSkill>(conn)
+        EmployeesSkill::belonging_to(&employees).load::<EmployeesSkill>(&conn.0)
     }
 
     pub fn filter_by_skill(
         conn: &LogsDbConn,
         skill: Skill,
     ) -> QueryResult<Vec<EmployeesSkill>> {
-        EmployeesSkill::belonging_to(&skill).load::<EmployeesSkill>(conn)
+        EmployeesSkill::belonging_to(&skill).load::<EmployeesSkill>(&conn.0)
     }
 
     pub fn filter_by_skills(
         conn: &LogsDbConn,
         skills: Vec<Skill>,
     ) -> QueryResult<Vec<EmployeesSkill>> {
-        EmployeesSkill::belonging_to(&skills).load::<EmployeesSkill>(conn)
+        EmployeesSkill::belonging_to(&skills).load::<EmployeesSkill>(&conn.0)
     }
 
     pub fn filter(
@@ -62,7 +62,7 @@ impl EmployeesSkill {
         let skills: Vec<i32> = skills.iter().map(|skill| skill.id).collect();
         EmployeesSkill::belonging_to(&employees)
             .filter(skill_id.eq_any(skills))
-            .load::<EmployeesSkill>(conn)
+            .load::<EmployeesSkill>(&conn.0)
     }
 }
 
@@ -77,7 +77,7 @@ impl NewEmployeesSkill {
     pub fn insert(self, conn: &LogsDbConn) -> QueryResult<usize> {
         diesel::insert_into(employees_skills_table)
             .values(self)
-            .execute(conn)
+            .execute(&conn.0)
     }
 
     pub fn insert_batch(
@@ -86,7 +86,7 @@ impl NewEmployeesSkill {
     ) -> QueryResult<usize> {
         diesel::insert_into(employees_skills_table)
             .values(values)
-            .execute(conn)
+            .execute(&*conn.0)
     }
 }
 

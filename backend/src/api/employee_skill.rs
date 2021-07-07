@@ -73,7 +73,7 @@ fn search(
 }
 
 fn match_employees(
-    connection: LogsDbConn,
+    connection: &LogsDbConn,
     name: Option<String>,
     employeenumber: Option<String>,
 ) -> Result<Vec<Employee>, BackendError> {

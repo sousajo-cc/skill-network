@@ -12,13 +12,13 @@ pub struct Skill {
 
 impl Skill {
     pub fn list(conn: &LogsDbConn) -> QueryResult<Vec<Skill>> {
-        skills_table.load::<Skill>(conn)
+        skills_table.load::<Skill>(&conn.0)
     }
 
     pub fn find(conn: &LogsDbConn, skill_id: i32) -> QueryResult<Skill> {
         skills_table
             .filter(id.eq(skill_id))
-            .get_result::<Skill>(conn)
+            .get_result::<Skill>(&conn.0)
     }
 
     #[allow(clippy::ptr_arg)]
@@ -27,7 +27,7 @@ impl Skill {
         let skill_name = format!("%{}%", skill_name);
         skills_table
             .filter(skill.like(skill_name))
-            .load::<Skill>(conn)
+            .load::<Skill>(&conn.0)
     }
 }
 
@@ -39,12 +39,12 @@ pub struct NewSkill {
 
 impl NewSkill {
     pub fn insert(self, conn: &LogsDbConn) -> QueryResult<usize> {
-        diesel::insert_into(skills_table).values(self).execute(conn)
+        diesel::insert_into(skills_table).values(self).execute(&conn.0)
     }
 
     pub fn insert_batch(conn: &LogsDbConn, values: Vec<NewSkill>) -> QueryResult<usize> {
         diesel::insert_into(skills_table)
             .values(values)
-            .execute(conn)
+            .execute(&*conn.0)
     }
 }
