@@ -41,6 +41,8 @@ fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
         Model::Home(m) => m,
         Model::Skill(m) => m,
         Model::Employee(m) => m,
+        Model::About(m) => m,
+        Model::NotFound(m) => m,
     };
     match &inner_model.page {
         Page::Home => page::home::init(orders.proxy(Msg::Home)),
@@ -95,6 +97,8 @@ pub fn view(model: &Model) -> impl IntoNodes<Msg> {
         Model::Home(m) => m,
         Model::Skill(m) => m,
         Model::Employee(m) => m,
+        Model::About(m) => m,
+        Model::NotFound(m) => m,
     };
     div![
         C![

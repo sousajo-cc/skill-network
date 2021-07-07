@@ -4,6 +4,8 @@ pub enum Model {
     Home(InnerModel),
     Skill(InnerModel),
     Employee(InnerModel),
+    About(InnerModel),
+    NotFound(InnerModel),
 }
 
 impl Model {
@@ -13,7 +15,8 @@ impl Model {
             Page::Home => Model::Home(inner_model),
             Page::Skill(_) => Model::Skill(inner_model),
             Page::Employee(_) => Model::Employee(inner_model),
-            _ => unimplemented!(),
+            Page::About => Model::About(inner_model),
+            Page::NotFound => Model::NotFound(inner_model),
         }
     }
 }
