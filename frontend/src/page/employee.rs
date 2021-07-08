@@ -1,5 +1,25 @@
 use crate::page::*;
 
+pub struct Model {
+    pub base_url: Url,
+    pub employee_id: String,
+    pub employee: Option<Employee>,
+    pub employee_skills: Vec<Skill>,
+    pub error: Option<String>,
+}
+
+impl Model {
+    pub fn new(url: &Url, employee_id: String) -> Self {
+        Self {
+            base_url: url.to_base_url(),
+            employee_id,
+            employee: None,
+            employee_skills: Vec::new(),
+            error: None,
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum Msg {
     EmployeeLoaded(Employee),
@@ -66,7 +86,7 @@ fn request_skills(orders: &mut impl Orders<Msg>, id: &str) {
 
 pub fn update(
     _orders: &mut impl Orders<Msg>,
-    model: &mut InnerModel,
+    model: &mut Model,
     msg: Msg,
 ) {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
@@ -78,12 +98,12 @@ pub fn update(
             model.employee_skills = skills;
         },
         Msg::RequestNOK(err_msg) => {
-            model.error_employee = Some(err_msg);
+            model.error = Some(err_msg);
         },
     }
 }
 
-fn list_skills(model: &InnerModel) -> Vec<Node<Msg>> {
+fn list_skills(model: &Model) -> Vec<Node<Msg>> {
     model
         .employee_skills
         .clone()
@@ -111,7 +131,7 @@ fn list_skills(model: &InnerModel) -> Vec<Node<Msg>> {
         .collect()
 }
 
-pub fn view(model: &InnerModel) -> Node<Msg> {
+pub fn view(model: &Model) -> Node<Msg> {
     match &model.error {
         None => employee_found_view(model),
         Some(_) => employee_not_found_view(model),
@@ -119,7 +139,7 @@ pub fn view(model: &InnerModel) -> Node<Msg> {
 }
 
 #[allow(clippy::too_many_lines)]
-pub fn employee_not_found_view(model: &InnerModel) -> Node<Msg> {
+pub fn employee_not_found_view(model: &Model) -> Node<Msg> {
     div![
         C![C.flex_grow,],
         // Main section
@@ -165,7 +185,7 @@ pub fn employee_not_found_view(model: &InnerModel) -> Node<Msg> {
                                 C.lg__leading_none,
                                 C.lg__text_120,
                             ],
-                            span!["Skill not found in the "],
+                            span!["Employee not found in the "],
                             span![C![C.font_bold], "Database"],
                         ]
                     ],
@@ -189,7 +209,7 @@ pub fn employee_not_found_view(model: &InnerModel) -> Node<Msg> {
 }
 
 #[allow(clippy::too_many_lines)]
-pub fn employee_found_view(model: &InnerModel) -> Node<Msg> {
+pub fn employee_found_view(model: &Model) -> Node<Msg> {
     div![
         C![C.flex_grow,],
         // Main section
