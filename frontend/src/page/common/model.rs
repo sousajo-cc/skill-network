@@ -1,41 +1,43 @@
 use crate::page::*;
 
-// TODO: separate into a model for each page
 pub struct Model {
-    pub base_url: Url,
-    pub page: Page,
-    pub scroll_history: ScrollHistory,
-    pub menu_visibility: Visibility,
-    pub in_prerendering: bool,
-    // home
-    pub search_query: String,
-    pub matched_skills: Vec<Skill>,
-    // skill page
-    pub skill: Option<Skill>,
-    pub matched_employees: Vec<Employee>,
-    pub error: Option<String>,
-    // employee page
-    pub employee: Option<Employee>,
-    pub employee_skills: Vec<Skill>,
-    pub error_employee: Option<String>,
+    pub header_model: partial::header::Model,
+    pub footer_model: partial::footer::Model,
+    pub page_model: PageModel,
 }
 
 impl Model {
     pub fn new(url: Url) -> Self {
-        Model {
-            base_url: url.to_base_url(),
-            page: Page::new(url),
-            scroll_history: ScrollHistory::new(),
-            menu_visibility: Visibility::Hidden,
-            in_prerendering: is_in_prerendering(),
-            search_query: String::new(),
-            matched_skills: Vec::new(),
-            skill: None,
-            matched_employees: Vec::new(),
-            error: None,
-            employee: None,
-            employee_skills: Vec::new(),
-            error_employee: None,
+        Self {
+            header_model: partial::header::Model::new(&url),
+            footer_model: partial::footer::Model,
+            page_model: PageModel::new(url),
+        }
+    }
+
+    pub fn is_in_prerendering(&self) -> bool {
+        self.header_model.in_prerendering
+    }
+}
+
+pub enum PageModel {
+    Home(home::Model),
+    Skill(skill::Model),
+    Employee(employee::Model),
+    About(about::Model),
+    NotFound(not_found::Model),
+}
+
+impl PageModel {
+    pub fn new(url: Url) -> Self {
+        let base_url = url.to_base_url();
+        let page = Page::new(url.clone());
+        match page {
+            Page::Home => Self::Home(home::Model::new(base_url)),
+            Page::Skill(id) => Self::Skill(skill::Model::new(base_url, id)),
+            Page::Employee(id) => Self::Employee(employee::Model::new(base_url, id)),
+            Page::About => Self::About(about::Model),
+            Page::NotFound => Self::NotFound(not_found::Model),
         }
     }
 }

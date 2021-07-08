@@ -1,5 +1,7 @@
 use crate::page::*;
 
+pub struct Model;
+
 #[derive(Debug)]
 pub enum Msg {}
 
@@ -8,7 +10,7 @@ pub fn init(mut _orders: impl Orders<Msg>) {
 }
 
 #[allow(clippy::too_many_lines)]
-pub fn view() -> Node<Msg> {
+pub fn view(_: &Model) -> Node<Msg> {
     div![
         C![C.flex_grow,],
         // Resume section

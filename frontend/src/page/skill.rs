@@ -1,5 +1,25 @@
 use crate::page::*;
 
+pub struct Model {
+    pub base_url: Url,
+    pub skill_id: String,
+    pub skill: Option<Skill>,
+    pub matched_employees: Vec<Employee>,
+    pub error: Option<String>,
+}
+
+impl Model {
+    pub fn new(base_url: Url, skill_id: String) -> Self {
+        Self {
+            base_url,
+            skill_id,
+            skill: None,
+            matched_employees: Vec::new(),
+            error: None,
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum Msg {
     SkillLoaded(Skill),
@@ -64,7 +84,11 @@ fn request_employees(orders: &mut impl Orders<Msg>, id: &str) {
     });
 }
 
-pub fn update(_orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
+pub fn update(
+    _orders: &mut impl Orders<Msg>,
+    model: &mut Model,
+    msg: Msg,
+) {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
     match msg {
         Msg::SkillLoaded(skill) => {

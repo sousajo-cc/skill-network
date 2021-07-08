@@ -1,5 +1,25 @@
 use crate::page::*;
 
+pub struct Model {
+    pub base_url: Url,
+    pub employee_id: String,
+    pub employee: Option<Employee>,
+    pub employee_skills: Vec<Skill>,
+    pub error: Option<String>,
+}
+
+impl Model {
+    pub fn new(base_url: Url, employee_id: String) -> Self {
+        Self {
+            base_url,
+            employee_id,
+            employee: None,
+            employee_skills: Vec::new(),
+            error: None,
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum Msg {
     EmployeeLoaded(Employee),
@@ -64,7 +84,11 @@ fn request_skills(orders: &mut impl Orders<Msg>, id: &str) {
     });
 }
 
-pub fn update(_orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
+pub fn update(
+    _orders: &mut impl Orders<Msg>,
+    model: &mut Model,
+    msg: Msg,
+) {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
     match msg {
         Msg::EmployeeLoaded(employee) => {
@@ -74,7 +98,7 @@ pub fn update(_orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
             model.employee_skills = skills;
         },
         Msg::RequestNOK(err_msg) => {
-            model.error_employee = Some(err_msg);
+            model.error = Some(err_msg);
         },
     }
 }
@@ -161,7 +185,7 @@ pub fn employee_not_found_view(model: &Model) -> Node<Msg> {
                                 C.lg__leading_none,
                                 C.lg__text_120,
                             ],
-                            span!["Skill not found in the "],
+                            span!["Employee not found in the "],
                             span![C![C.font_bold], "Database"],
                         ]
                     ],

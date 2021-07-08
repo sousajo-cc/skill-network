@@ -1,9 +1,15 @@
 use crate::page::*;
 
+pub struct Model;
+
 #[derive(Debug)]
 pub enum Msg {}
 
-pub fn view() -> Node<Msg> {
+pub fn init(mut _orders: impl Orders<Msg>) {}
+
+pub fn update(_orders: &mut impl Orders<Msg>, _model: &mut Model, _msg: Msg) {}
+
+pub fn view(_: &Model) -> Node<Msg> {
     footer![
         C![
             C.h_16,
