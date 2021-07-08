@@ -7,7 +7,7 @@ pub fn init(mut _orders: impl Orders<Msg>) {
     document().set_title(&format!("404 - {}", TITLE_SUFFIX));
 }
 
-pub fn view() -> Node<Msg> {
+pub fn view(_: &InnerModel) -> Node<Msg> {
     div![
         C![
             C.mt_16,

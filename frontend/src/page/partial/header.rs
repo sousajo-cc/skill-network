@@ -1,10 +1,56 @@
 use crate::page::*;
 
+pub struct Model {
+    pub base_url: Url,
+    pub scroll_history: ScrollHistory,
+    pub menu_visibility: Visibility,
+    pub in_prerendering: bool,
+}
+
+impl Model {
+    pub fn new(url: &Url) -> Self {
+        Self {
+            base_url: url.to_base_url(),
+            scroll_history: ScrollHistory::new(),
+            menu_visibility: Visibility::Hidden,
+            in_prerendering: is_in_prerendering(),
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum Msg {
     ScrollToTop,
+    Scrolled,
     ToggleMenu,
     HideMenu,
+}
+
+pub fn init(mut orders: impl Orders<Msg>) {
+    orders.stream(streams::window_event(Ev::Scroll, |_| Msg::Scrolled));
+}
+
+pub fn update(_orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
+    std::panic::set_hook(Box::new(console_error_panic_hook::hook));
+    match msg {
+        Msg::ScrollToTop => window().scroll_to_with_scroll_to_options(
+            web_sys::ScrollToOptions::new().top(0.),
+        ),
+        Msg::Scrolled => {
+            let mut position = body().scroll_top();
+            if position == 0 {
+                position = document()
+                    .document_element()
+                    .expect("get document element")
+                    .scroll_top()
+            }
+            *model.scroll_history.push_back() = position;
+        },
+        Msg::ToggleMenu => model.menu_visibility.toggle(),
+        Msg::HideMenu => {
+            model.menu_visibility = Visibility::Hidden;
+        },
+    }
 }
 
 fn header_visibility(
@@ -23,7 +69,7 @@ fn header_visibility(
 }
 
 #[allow(clippy::too_many_lines)]
-pub fn view(model: &InnerModel) -> Vec<Node<Msg>> {
+pub fn view(model: &Model) -> Vec<Node<Msg>> {
     let show_header =
         header_visibility(model.menu_visibility, &model.scroll_history)
             == Visibility::Visible;
@@ -44,23 +90,24 @@ pub fn view(model: &InnerModel) -> Vec<Node<Msg>> {
 
             ]
         ),
+        // I don't know what this is, but maybe it should be in about::view
         // Photo 1
-        IF!(model.page == Page::About =>
-            div![
-                C![
-                    C.absolute,
-                    C.top_0,
-                    C.inset_x_0,
-                    C.mt_6,
-                    C.flex,
-                    C.justify_center
-                    // sm__
-                    C.sm__mt_10,
-                    // md__
-                    C.md__mt_8,
-                ],
-            ]
-        ),
+        // IF!(model.page == Page::About =>
+        //     div![
+        //         C![
+        //             C.absolute,
+        //             C.top_0,
+        //             C.inset_x_0,
+        //             C.mt_6,
+        //             C.flex,
+        //             C.justify_center
+        //             // sm__
+        //             C.sm__mt_10,
+        //             // md__
+        //             C.md__mt_8,
+        //         ],
+        //     ]
+        // ),
         // Menu
         IF!(model.menu_visibility == Visibility::Visible =>
             div![
@@ -95,11 +142,11 @@ pub fn view(model: &InnerModel) -> Vec<Node<Msg>> {
                                 C.h_full,
                                 C.border_l_4,
                                 C.border_r_4,
-                                if model.page == Page::Home {
-                                    C.border_yellow_6
-                                } else {
-                                    C.border_gray_2
-                                },
+                                // if model.page == Page::Home {
+                                //     C.border_yellow_6
+                                // } else {
+                                //     C.border_gray_2
+                                // },
                                 C.w_full,
                                 // sm__
                                 C.sm__hidden,

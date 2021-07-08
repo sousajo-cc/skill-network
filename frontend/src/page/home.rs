@@ -2,17 +2,12 @@ use crate::page::*;
 
 #[derive(Debug)]
 pub enum Msg {
-    ScrollToTop,
-    Scrolled,
-    ToggleMenu,
     SearchQueryChanged(String),
-    HideMenu,
     Received(Vec<Skill>),
 }
 
-pub fn init(mut orders: impl Orders<Msg>) {
+pub fn init(mut _orders: impl Orders<Msg>) {
     document().set_title(TITLE_SUFFIX);
-    orders.stream(streams::window_event(Ev::Scroll, |_| Msg::Scrolled));
 }
 
 pub fn generate_skill_list(model: &InnerModel) -> Vec<Node<Msg>> {
@@ -47,23 +42,6 @@ pub fn generate_skill_list(model: &InnerModel) -> Vec<Node<Msg>> {
 pub fn update(orders: &mut impl Orders<Msg>, model: &mut InnerModel, msg: Msg) {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
     match msg {
-        Msg::ScrollToTop => window().scroll_to_with_scroll_to_options(
-            web_sys::ScrollToOptions::new().top(0.),
-        ),
-        Msg::Scrolled => {
-            let mut position = body().scroll_top();
-            if position == 0 {
-                position = document()
-                    .document_element()
-                    .expect("get document element")
-                    .scroll_top()
-            }
-            *model.scroll_history.push_back() = position;
-        },
-        Msg::ToggleMenu => model.menu_visibility.toggle(),
-        Msg::HideMenu => {
-            model.menu_visibility = Visibility::Hidden;
-        },
         Msg::SearchQueryChanged(query) => {
             model.search_query = query.clone();
 

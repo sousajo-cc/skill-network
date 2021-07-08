@@ -8,7 +8,7 @@ pub fn init(mut _orders: impl Orders<Msg>) {
 }
 
 #[allow(clippy::too_many_lines)]
-pub fn view() -> Node<Msg> {
+pub fn view(_: &InnerModel) -> Node<Msg> {
     div![
         C![C.flex_grow,],
         // Resume section
