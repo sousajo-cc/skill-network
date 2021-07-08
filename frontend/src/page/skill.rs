@@ -1,5 +1,25 @@
 use crate::page::*;
 
+pub struct Model {
+    pub base_url: Url,
+    pub skill_id: String,
+    pub skill: Option<Skill>,
+    pub matched_employees: Vec<Employee>,
+    pub error: Option<String>,
+}
+
+impl Model {
+    pub fn new(url: &Url, skill_id: String) -> Self {
+        Self {
+            base_url: url.to_base_url(),
+            skill_id,
+            skill: None,
+            matched_employees: Vec::new(),
+            error: None,
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum Msg {
     SkillLoaded(Skill),
@@ -66,7 +86,7 @@ fn request_employees(orders: &mut impl Orders<Msg>, id: &str) {
 
 pub fn update(
     _orders: &mut impl Orders<Msg>,
-    model: &mut InnerModel,
+    model: &mut Model,
     msg: Msg,
 ) {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
@@ -83,7 +103,7 @@ pub fn update(
     }
 }
 
-fn list_employees(model: &InnerModel) -> Vec<Node<Msg>> {
+fn list_employees(model: &Model) -> Vec<Node<Msg>> {
     model
         .matched_employees
         .clone()
@@ -102,7 +122,7 @@ fn list_employees(model: &InnerModel) -> Vec<Node<Msg>> {
         .collect()
 }
 
-pub fn view(model: &InnerModel) -> Node<Msg> {
+pub fn view(model: &Model) -> Node<Msg> {
     match &model.error {
         None => skill_found_view(model),
         Some(_) => skill_not_found_view(model),
@@ -110,7 +130,7 @@ pub fn view(model: &InnerModel) -> Node<Msg> {
 }
 
 #[allow(clippy::too_many_lines)]
-pub fn skill_not_found_view(model: &InnerModel) -> Node<Msg> {
+pub fn skill_not_found_view(model: &Model) -> Node<Msg> {
     if !model.matched_employees.is_empty() {
         seed::log(&model.matched_employees[0].name);
     }
@@ -184,7 +204,7 @@ pub fn skill_not_found_view(model: &InnerModel) -> Node<Msg> {
 }
 
 #[allow(clippy::too_many_lines)]
-pub fn skill_found_view(model: &InnerModel) -> Node<Msg> {
+pub fn skill_found_view(model: &Model) -> Node<Msg> {
     if !model.matched_employees.is_empty() {
         seed::log(&model.matched_employees[0].name);
     }

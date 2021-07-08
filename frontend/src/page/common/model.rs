@@ -22,7 +22,7 @@ impl Model {
 
 pub enum PageModel {
     Home(home::Model),
-    Skill(InnerModel),
+    Skill(skill::Model),
     Employee(InnerModel),
     About(about::Model),
     NotFound(not_found::Model),
@@ -34,10 +34,7 @@ impl PageModel {
         let page = Page::new(url.clone());
         match page {
             Page::Home => Self::Home(home::Model::new(&url)),
-            Page::Skill(id) => {
-                inner_model.skill_id = id;
-                Self::Skill(inner_model)
-            },
+            Page::Skill(id) => Self::Skill(skill::Model::new(&url, id)),
             Page::Employee(id) => {
                 inner_model.employee_id = id;
                 Self::Employee(inner_model)
