@@ -1,5 +1,21 @@
 use crate::page::*;
 
+pub struct Model {
+    pub base_url: Url,
+    pub search_query: String,
+    pub matched_skills: Vec<Skill>,
+}
+
+impl Model {
+    pub fn new(url: &Url) -> Self {
+        Self {
+            base_url: url.to_base_url(),
+            search_query: String::new(),
+            matched_skills: Vec::new(),
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum Msg {
     SearchQueryChanged(String),
@@ -10,7 +26,7 @@ pub fn init(mut _orders: impl Orders<Msg>) {
     document().set_title(TITLE_SUFFIX);
 }
 
-pub fn generate_skill_list(model: &InnerModel) -> Vec<Node<Msg>> {
+pub fn generate_skill_list(model: &Model) -> Vec<Node<Msg>> {
     seed::log("matched skills:");
     seed::log(model.matched_skills.clone());
 
@@ -39,7 +55,7 @@ pub fn generate_skill_list(model: &InnerModel) -> Vec<Node<Msg>> {
         .collect()
 }
 
-pub fn update(orders: &mut impl Orders<Msg>, model: &mut InnerModel, msg: Msg) {
+pub fn update(orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
     match msg {
         Msg::SearchQueryChanged(query) => {
@@ -80,7 +96,7 @@ pub fn update(orders: &mut impl Orders<Msg>, model: &mut InnerModel, msg: Msg) {
 }
 
 #[allow(clippy::too_many_lines)]
-pub fn view(model: &InnerModel) -> Node<Msg> {
+pub fn view(model: &Model) -> Node<Msg> {
     if !model.matched_skills.is_empty() {
         seed::log(&model.matched_skills[0].skill);
     }

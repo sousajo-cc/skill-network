@@ -21,7 +21,7 @@ impl Model {
 }
 
 pub enum PageModel {
-    Home(InnerModel),
+    Home(home::Model),
     Skill(InnerModel),
     Employee(InnerModel),
     About(about::Model),
@@ -31,9 +31,9 @@ pub enum PageModel {
 impl PageModel {
     pub fn new(url: Url) -> Self {
         let mut inner_model = InnerModel::new(&url);
-        let page = Page::new(url);
+        let page = Page::new(url.clone());
         match page {
-            Page::Home => Self::Home(inner_model),
+            Page::Home => Self::Home(home::Model::new(&url)),
             Page::Skill(id) => {
                 inner_model.skill_id = id;
                 Self::Skill(inner_model)
@@ -50,9 +50,6 @@ impl PageModel {
 
 pub struct InnerModel {
     pub base_url: Url,
-    // home
-    pub search_query: String,
-    pub matched_skills: Vec<Skill>,
     // skill page
     pub skill_id: String,
     pub skill: Option<Skill>,
@@ -67,10 +64,8 @@ pub struct InnerModel {
 
 impl InnerModel {
     pub fn new(url: &Url) -> Self {
-        InnerModel {
+        Self {
             base_url: url.to_base_url(),
-            search_query: String::new(),
-            matched_skills: Vec::new(),
             skill_id: String::new(),
             skill: None,
             matched_employees: Vec::new(),
