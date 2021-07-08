@@ -25,7 +25,7 @@ pub enum PageModel {
     Skill(InnerModel),
     Employee(InnerModel),
     About(about::Model),
-    NotFound(InnerModel),
+    NotFound(not_found::Model),
 }
 
 impl PageModel {
@@ -43,7 +43,7 @@ impl PageModel {
                 Self::Employee(inner_model)
             },
             Page::About => Self::About(about::Model),
-            Page::NotFound => Self::NotFound(inner_model),
+            Page::NotFound => Self::NotFound(not_found::Model),
         }
     }
 }
