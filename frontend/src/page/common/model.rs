@@ -1,18 +1,16 @@
 use crate::page::*;
-use crate::page::partial::header::Model as HeaderModel;
-use crate::page::partial::footer::Model as FooterModel;
 
 pub struct Model {
-    pub header_model: HeaderModel,
-    pub footer_model: FooterModel,
+    pub header_model: partial::header::Model,
+    pub footer_model: partial::footer::Model,
     pub page_model: PageModel,
 }
 
 impl Model {
     pub fn new(url: Url) -> Self {
         Self {
-            header_model: HeaderModel::new(&url),
-            footer_model: FooterModel,
+            header_model: partial::header::Model::new(&url),
+            footer_model: partial::footer::Model,
             page_model: PageModel::new(url),
         }
     }
@@ -26,7 +24,7 @@ pub enum PageModel {
     Home(InnerModel),
     Skill(InnerModel),
     Employee(InnerModel),
-    About(InnerModel),
+    About(about::Model),
     NotFound(InnerModel),
 }
 
@@ -44,7 +42,7 @@ impl PageModel {
                 inner_model.employee_id = id;
                 Self::Employee(inner_model)
             },
-            Page::About => Self::About(inner_model),
+            Page::About => Self::About(about::Model),
             Page::NotFound => Self::NotFound(inner_model),
         }
     }
