@@ -9,9 +9,9 @@ pub struct Model {
 }
 
 impl Model {
-    pub fn new(url: &Url, skill_id: String) -> Self {
+    pub fn new(base_url: Url, skill_id: String) -> Self {
         Self {
-            base_url: url.to_base_url(),
+            base_url,
             skill_id,
             skill: None,
             matched_employees: Vec::new(),

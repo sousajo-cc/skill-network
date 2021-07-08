@@ -7,9 +7,9 @@ pub struct Model {
 }
 
 impl Model {
-    pub fn new(url: &Url) -> Self {
+    pub fn new(base_url: Url) -> Self {
         Self {
-            base_url: url.to_base_url(),
+            base_url,
             search_query: String::new(),
             matched_skills: Vec::new(),
         }
