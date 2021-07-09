@@ -111,12 +111,12 @@ pub fn view(model: &Model) -> impl IntoNodes<Msg> {
             C.flex_col,
         ],
         match &model.page_model {
-            PageModel::Home(inner_model) => page::home::view(&inner_model).map_msg(Msg::Home),
-            PageModel::About(inner_model) => page::about::view(&inner_model).map_msg(Msg::About),
-            PageModel::Skill(inner_model) => page::skill::view(&inner_model).map_msg(Msg::Skill),
+            PageModel::Home(inner_model) => page::home::view(inner_model).map_msg(Msg::Home),
+            PageModel::About(inner_model) => page::about::view(inner_model).map_msg(Msg::About),
+            PageModel::Skill(inner_model) => page::skill::view(inner_model).map_msg(Msg::Skill),
             PageModel::Employee(inner_model) =>
-                page::employee::view(&inner_model).map_msg(Msg::Employee),
-            PageModel::NotFound(inner_model) => page::not_found::view(&inner_model).map_msg(Msg::NotFound),
+                page::employee::view(inner_model).map_msg(Msg::Employee),
+            PageModel::NotFound(inner_model) => page::not_found::view(inner_model).map_msg(Msg::NotFound),
         },
         page::partial::header::view(&model.header_model).map_msg(Msg::Header),
         page::partial::footer::view(&model.footer_model).map_msg(Msg::Footer),
