@@ -31,7 +31,7 @@ pub enum PageModel {
 impl PageModel {
     pub fn new(url: Url) -> Self {
         let base_url = url.to_base_url();
-        let page = Page::new(url.clone());
+        let page = Page::new(url);
         match page {
             Page::Home => Self::Home(home::Model::new(base_url)),
             Page::Skill(id) => Self::Skill(skill::Model::new(base_url, id)),
