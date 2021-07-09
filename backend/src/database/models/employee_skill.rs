@@ -4,7 +4,6 @@ use crate::database::models::tables::employee_skill::*;
 use crate::result::BackendError;
 use diesel::prelude::*;
 use diesel::RunQueryDsl;
-use crate::LogsDbConn;
 
 #[derive(Queryable, Serialize, Identifiable, Associations, Clone, Debug)]
 #[belongs_to(Employee, foreign_key = "employee_number")]
@@ -16,53 +15,53 @@ pub struct EmployeesSkill {
 }
 
 impl EmployeesSkill {
-    pub fn list(conn: &LogsDbConn) -> QueryResult<Vec<EmployeesSkill>> {
-        employees_skills_table.load::<EmployeesSkill>(&conn.0)
+    pub fn list(conn: &SqliteConnection) -> QueryResult<Vec<EmployeesSkill>> {
+        employees_skills_table.load::<EmployeesSkill>(conn)
     }
 
-    pub fn find(conn: &LogsDbConn, employee_skill_id: i32) -> QueryResult<EmployeesSkill> {
+    pub fn find(conn: &SqliteConnection, employee_skill_id: i32) -> QueryResult<EmployeesSkill> {
         employees_skills_table
             .filter(id.eq(employee_skill_id))
-            .get_result::<EmployeesSkill>(&conn.0)
+            .get_result::<EmployeesSkill>(conn)
     }
 
     pub fn filter_by_employee(
-        conn: &LogsDbConn,
+        conn: &SqliteConnection,
         employee: Employee,
     ) -> QueryResult<Vec<EmployeesSkill>> {
-        EmployeesSkill::belonging_to(&employee).load::<EmployeesSkill>(&conn.0)
+        EmployeesSkill::belonging_to(&employee).load::<EmployeesSkill>(conn)
     }
 
     pub fn filter_by_employees(
-        conn: &LogsDbConn,
+        conn: &SqliteConnection,
         employees: Vec<Employee>,
     ) -> QueryResult<Vec<EmployeesSkill>> {
-        EmployeesSkill::belonging_to(&employees).load::<EmployeesSkill>(&conn.0)
+        EmployeesSkill::belonging_to(&employees).load::<EmployeesSkill>(conn)
     }
 
     pub fn filter_by_skill(
-        conn: &LogsDbConn,
+        conn: &SqliteConnection,
         skill: Skill,
     ) -> QueryResult<Vec<EmployeesSkill>> {
-        EmployeesSkill::belonging_to(&skill).load::<EmployeesSkill>(&conn.0)
+        EmployeesSkill::belonging_to(&skill).load::<EmployeesSkill>(conn)
     }
 
     pub fn filter_by_skills(
-        conn: &LogsDbConn,
+        conn: &SqliteConnection,
         skills: Vec<Skill>,
     ) -> QueryResult<Vec<EmployeesSkill>> {
-        EmployeesSkill::belonging_to(&skills).load::<EmployeesSkill>(&conn.0)
+        EmployeesSkill::belonging_to(&skills).load::<EmployeesSkill>(conn)
     }
 
     pub fn filter(
-        conn: &LogsDbConn,
+        conn: &SqliteConnection,
         employees: Vec<Employee>,
         skills: Vec<Skill>,
     ) -> QueryResult<Vec<EmployeesSkill>> {
         let skills: Vec<i32> = skills.iter().map(|skill| skill.id).collect();
         EmployeesSkill::belonging_to(&employees)
             .filter(skill_id.eq_any(skills))
-            .load::<EmployeesSkill>(&conn.0)
+            .load::<EmployeesSkill>(conn)
     }
 }
 
@@ -74,19 +73,19 @@ pub struct NewEmployeesSkill {
 }
 
 impl NewEmployeesSkill {
-    pub fn insert(self, conn: &LogsDbConn) -> QueryResult<usize> {
+    pub fn insert(self, conn: &SqliteConnection) -> QueryResult<usize> {
         diesel::insert_into(employees_skills_table)
             .values(self)
-            .execute(&conn.0)
+            .execute(conn)
     }
 
     pub fn insert_batch(
-        conn: &LogsDbConn,
+        conn: &SqliteConnection,
         values: Vec<NewEmployeesSkill>,
     ) -> QueryResult<usize> {
         diesel::insert_into(employees_skills_table)
             .values(values)
-            .execute(&*conn.0)
+            .execute(conn)
     }
 }
 

@@ -10,26 +10,21 @@ use crate::LogsDbConn;
 //use diesel::SqliteConnection;
 
 #[get("/")]
-fn get_all(
-        connection: LogsDbConn
-) -> Result<Json<Vec<EmployeesSkill>>, BackendError> {
+fn get_all(connection: LogsDbConn) -> Result<Json<Vec<EmployeesSkill>>, BackendError> {
     let employee_skill_list = EmployeesSkill::list(&connection)?;
     Ok(Json(employee_skill_list))
 }
 
 #[get("/<id>")]
-fn get_by_id(
-        id: i32, 
-        connection: LogsDbConn
-) -> Result<Json<EmployeesSkill>, BackendError> {
+fn get_by_id(id: i32, connection: LogsDbConn) -> Result<Json<EmployeesSkill>, BackendError> {
     let employee_skill = EmployeesSkill::find(&connection, id)?;
     Ok(Json(employee_skill))
 }
 
 #[get("/list_employees_with_skill/<skill>")]
 fn list_employees_with_skill(
-                        skill: i32, 
-                        connection: LogsDbConn
+    skill: i32,
+    connection: LogsDbConn,
 ) -> Result<Json<Vec<Employee>>, BackendError> {
     use diesel::QueryResult; //TODO: use our own error types so we don't have the outer api dependending on diesel
 
@@ -43,8 +38,8 @@ fn list_employees_with_skill(
 
 #[get("/list_skills_for_employee/<employee>")]
 fn list_skills_for_employee(
-                        employee: String, 
-                        connection: LogsDbConn
+    employee: String,
+    connection: LogsDbConn,
 ) -> Result<Json<Vec<Skill>>, BackendError> {
     use diesel::QueryResult; //TODO: use our own error types so we don't have the outer api dependending on diesel
 
@@ -61,7 +56,7 @@ fn search(
     skill: Option<String>,
     name: Option<String>,
     employeenumber: Option<String>,
-    connection: LogsDbConn
+    connection: LogsDbConn,
 ) -> Result<Json<Vec<EmployeesSkill>>, BackendError> {
     let matched_employees = match_employees(&connection, name, employeenumber)?;
     let matched_skills = match skill {
@@ -107,7 +102,7 @@ fn match_employees(
 #[post("/", data = "<employee_skill>")]
 fn insert(
     employee_skill: Json<NewEmployeesSkill>,
-    connection: LogsDbConn
+    connection: LogsDbConn,
 ) -> Result<Json<usize>, BackendError> {
     let employee_skill = employee_skill.into_inner();
     let insert = employee_skill.insert(&connection)?;
@@ -117,7 +112,7 @@ fn insert(
 #[post("/batch", data = "<employee_skills>")]
 fn insert_batch(
     employee_skills: Json<Vec<NewEmployeesSkill>>,
-    connection: LogsDbConn
+    connection: LogsDbConn,
 ) -> Result<Json<usize>, BackendError> {
     let employee_skills = employee_skills.into_inner();
     let insert = NewEmployeesSkill::insert_batch(&connection, employee_skills)?;

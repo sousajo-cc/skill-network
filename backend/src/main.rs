@@ -13,7 +13,7 @@ use result::BackendError;
 use rocket_cors::{AllowedHeaders, AllowedOrigins, Error};
 
 #[database("sqlite_logs")]
-struct LogsDbConn(diesel::SqliteConnection);
+pub struct LogsDbConn(pub diesel::SqliteConnection);
 
 extern crate dotenv;
 #[macro_use]
@@ -22,7 +22,7 @@ extern crate rocket;
 extern crate diesel;
 #[macro_use]
 extern crate serde_derive;
-#[macro_use] 
+#[macro_use]
 extern crate rocket_contrib;
 
 pub fn employee_skill_example() -> Result<(), BackendError> {
