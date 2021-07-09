@@ -1,3 +1,5 @@
+#![allow(clippy::nonstandard_macro_braces)]
+
 #![deny(warnings)]
 #![feature(proc_macro_hygiene, decl_macro)]
 
