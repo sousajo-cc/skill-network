@@ -1,22 +1,20 @@
 use rocket::Rocket;
 use rocket_contrib::json::Json;
 
-//use crate::database::establish_connection;
 use crate::database::models::employee::Employee;
 use crate::database::models::employee_skill::{EmployeesSkill, NewEmployeesSkill};
 use crate::database::models::skill::Skill;
 use crate::result::BackendError;
-use crate::LogsDbConn;
-//use diesel::SqliteConnection;
+use crate::DbConn;
 
 #[get("/")]
-fn get_all(connection: LogsDbConn) -> Result<Json<Vec<EmployeesSkill>>, BackendError> {
+fn get_all(connection: DbConn) -> Result<Json<Vec<EmployeesSkill>>, BackendError> {
     let employee_skill_list = EmployeesSkill::list(&connection.0)?;
     Ok(Json(employee_skill_list))
 }
 
 #[get("/<id>")]
-fn get_by_id(id: i32, connection: LogsDbConn) -> Result<Json<EmployeesSkill>, BackendError> {
+fn get_by_id(id: i32, connection: DbConn) -> Result<Json<EmployeesSkill>, BackendError> {
     let employee_skill = EmployeesSkill::find(&connection.0, id)?;
     Ok(Json(employee_skill))
 }
@@ -24,7 +22,7 @@ fn get_by_id(id: i32, connection: LogsDbConn) -> Result<Json<EmployeesSkill>, Ba
 #[get("/list_employees_with_skill/<skill>")]
 fn list_employees_with_skill(
     skill: i32,
-    connection: LogsDbConn,
+    connection: DbConn,
 ) -> Result<Json<Vec<Employee>>, BackendError> {
     use diesel::QueryResult; //TODO: use our own error types so we don't have the outer api dependending on diesel
 
@@ -39,7 +37,7 @@ fn list_employees_with_skill(
 #[get("/list_skills_for_employee/<employee>")]
 fn list_skills_for_employee(
     employee: String,
-    connection: LogsDbConn,
+    connection: DbConn,
 ) -> Result<Json<Vec<Skill>>, BackendError> {
     use diesel::QueryResult; //TODO: use our own error types so we don't have the outer api dependending on diesel
 
@@ -56,7 +54,7 @@ fn search(
     skill: Option<String>,
     name: Option<String>,
     employeenumber: Option<String>,
-    connection: LogsDbConn,
+    connection: DbConn,
 ) -> Result<Json<Vec<EmployeesSkill>>, BackendError> {
     let matched_employees = match_employees(&connection, name, employeenumber)?;
     let matched_skills = match skill {
@@ -68,7 +66,7 @@ fn search(
 }
 
 fn match_employees(
-    connection: &LogsDbConn,
+    connection: &DbConn,
     name: Option<String>,
     employeenumber: Option<String>,
 ) -> Result<Vec<Employee>, BackendError> {
@@ -102,7 +100,7 @@ fn match_employees(
 #[post("/", data = "<employee_skill>")]
 fn insert(
     employee_skill: Json<NewEmployeesSkill>,
-    connection: LogsDbConn,
+    connection: DbConn,
 ) -> Result<Json<usize>, BackendError> {
     let employee_skill = employee_skill.into_inner();
     let insert = employee_skill.insert(&connection.0)?;
@@ -112,7 +110,7 @@ fn insert(
 #[post("/batch", data = "<employee_skills>")]
 fn insert_batch(
     employee_skills: Json<Vec<NewEmployeesSkill>>,
-    connection: LogsDbConn,
+    connection: DbConn,
 ) -> Result<Json<usize>, BackendError> {
     let employee_skills = employee_skills.into_inner();
     let insert = NewEmployeesSkill::insert_batch(&connection.0, employee_skills)?;

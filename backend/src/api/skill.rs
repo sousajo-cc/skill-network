@@ -1,31 +1,30 @@
 use rocket::Rocket;
 use rocket_contrib::json::Json;
 
-//use crate::database::establish_connection;
 use crate::database::models::skill::{NewSkill, Skill};
 use crate::result::BackendError;
-use crate::LogsDbConn;
+use crate::DbConn;
 
 #[get("/")]
-fn get_all(connection: LogsDbConn) -> Result<Json<Vec<Skill>>, BackendError> {
+fn get_all(connection: DbConn) -> Result<Json<Vec<Skill>>, BackendError> {
     let skill_list = Skill::list(&connection)?;
     Ok(Json(skill_list))
 }
 
 #[get("/<id>")]
-fn get_by_id(id: i32, connection: LogsDbConn) -> Result<Json<Skill>, BackendError> {
+fn get_by_id(id: i32, connection: DbConn) -> Result<Json<Skill>, BackendError> {
     let skill = Skill::find(&connection, id)?;
     Ok(Json(skill))
 }
 
 #[get("/search/<name>")]
-fn search_by_name(name: String, connection: LogsDbConn) -> Result<Json<Vec<Skill>>, BackendError> {
+fn search_by_name(name: String, connection: DbConn) -> Result<Json<Vec<Skill>>, BackendError> {
     let skill = Skill::filter(&connection, &name)?;
     Ok(Json(skill))
 }
 
 #[post("/", data = "<skill>")]
-fn insert(skill: Json<NewSkill>, connection: LogsDbConn) -> Result<Json<usize>, BackendError> {
+fn insert(skill: Json<NewSkill>, connection: DbConn) -> Result<Json<usize>, BackendError> {
     let skill = skill.0;
     let insert = skill.insert(&connection)?;
     Ok(Json(insert))
@@ -34,7 +33,7 @@ fn insert(skill: Json<NewSkill>, connection: LogsDbConn) -> Result<Json<usize>, 
 #[post("/batch", data = "<skills>")]
 fn insert_batch(
     skills: Json<Vec<NewSkill>>,
-    connection: LogsDbConn,
+    connection: DbConn,
 ) -> Result<Json<usize>, BackendError> {
     let skills = skills.0;
     let insert = NewSkill::insert_batch(&connection, skills)?;

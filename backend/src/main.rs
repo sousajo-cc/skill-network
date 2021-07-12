@@ -13,8 +13,8 @@ use dotenv::dotenv;
 use result::BackendError;
 use rocket_cors::{AllowedHeaders, AllowedOrigins, Error};
 
-#[database("sqlite_logs")]
-pub struct LogsDbConn(pub diesel::SqliteConnection);
+#[database("network_db")]
+pub struct DbConn(pub diesel::SqliteConnection);
 
 extern crate dotenv;
 #[macro_use]
@@ -170,7 +170,7 @@ pub fn main() -> Result<(), Error> {
         .mount_skill_api("/skill")
         .mount_employee_skill_api("/")
         .attach(cors)
-        .attach(LogsDbConn::fairing())
+        .attach(DbConn::fairing())
         .launch();
     Ok(())
 }
