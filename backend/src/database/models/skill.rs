@@ -1,7 +1,6 @@
 use crate::database::models::tables::skill::*;
 use crate::database::sanitize_search_string::Sanitize;
 use diesel::prelude::*;
-use diesel::SqliteConnection;
 
 #[derive(Queryable, Serialize, Identifiable, Clone, Debug)]
 pub struct Skill {

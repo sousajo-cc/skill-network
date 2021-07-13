@@ -3,7 +3,7 @@ pub mod sanitize_search_string;
 pub mod schema;
 
 use diesel::prelude::*;
-use diesel::sqlite::SqliteConnection;
+use diesel::SqliteConnection;
 use dotenv::dotenv;
 use std::env;
 

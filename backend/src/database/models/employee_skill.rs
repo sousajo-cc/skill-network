@@ -3,7 +3,7 @@ use crate::database::models::skill::Skill;
 use crate::database::models::tables::employee_skill::*;
 use crate::result::BackendError;
 use diesel::prelude::*;
-use diesel::{RunQueryDsl, SqliteConnection};
+use diesel::RunQueryDsl;
 
 #[derive(Queryable, Serialize, Identifiable, Associations, Clone, Debug)]
 #[belongs_to(Employee, foreign_key = "employee_number")]

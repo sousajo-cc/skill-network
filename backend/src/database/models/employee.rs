@@ -1,7 +1,7 @@
 use crate::database::models::tables::employee::*;
 use crate::database::sanitize_search_string::Sanitize;
 use diesel::prelude::*;
-use diesel::{RunQueryDsl, SqliteConnection};
+use diesel::RunQueryDsl;
 
 #[derive(Insertable, Queryable, Serialize, Deserialize, Identifiable, PartialEq, Clone, Debug)]
 #[primary_key(employee_number)]
