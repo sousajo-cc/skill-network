@@ -181,63 +181,67 @@ pub fn view(model: &Model) -> Node<Msg> {
                             "..."
                         ]
                     ],
-                    div![
-                        C![
-                            C.flex_1,
-                            C.w_full,
-                            C.mx_auto,
-                            C.max_w_sm,
-                            C.content_center,
-                            C.pt_4,
-                            C.mb_6,
-                            // lg__
-                            C.lg__pt_0,
-                        ],
-                        div![
-                            C![
-                                C.relative, C.pl_4, C.pr_4, // md__
-                                C.md__pr_0,
-                            ],
-                            // search icon
-                            div![
-                                C![C.absolute,],
-                                style! {
-                                    St::Top => rem(0.6),
-                                    St::Left => rem(1.5),
-                                },
-                            ],
-                            input![
-                                C![
-                                    C.w_full,
-                                    C.bg_gray_1,
-                                    C.text_25,
-                                    C.text_25,
-                                    IF!(model.search_query.is_empty() => C.font_bold),
-                                    C.placeholder_gray_4,
-                                    C.border_b_4,
-                                    C.border_gray_5,
-                                    C.focus__outline_none,
-                                    C.pt_2,
-                                    C.pb_2,
-                                    C.px_2,
-                                    C.pl_8,
-                                    C.appearance_none,
-                                ],
-                                // ev(Ev::KeyPress, |_| Msg::ToggleGuideList),
-                                attrs! {
-                                    At::Type => "search",
-                                    At::Placeholder => "Search",
-                                    At::Value => model.search_query,
-                                },
-                                input_ev(Ev::Input, Msg::SearchQueryChanged),
-                            ]
-                        ],
-                        div![nodes!(generate_skill_list(model))]
-                    ]
+                    search_bar(model)
                 ],
             ],
             // Gear
         ],
         // Circles
+    ]
+}
+
+fn search_bar(model: &Model) -> Node<Msg> {
+    div![
+        C![
+            C.flex_1,
+            C.w_full,
+            C.mx_auto,
+            C.max_w_sm,
+            C.content_center,
+            C.pt_4,
+            C.mb_6,
+            // lg__
+            C.lg__pt_0,
+        ],
+        div![
+            C![
+                C.relative, C.pl_4, C.pr_4, // md__
+                C.md__pr_0,
+            ],
+            // search icon
+            div![
+                C![C.absolute,],
+                style! {
+                    St::Top => rem(0.6),
+                    St::Left => rem(1.5),
+                },
+            ],
+            input![
+                C![
+                    C.w_full,
+                    C.bg_gray_1,
+                    C.text_25,
+                    C.text_25,
+                    IF!(model.search_query.is_empty() => C.font_bold),
+                    C.placeholder_gray_4,
+                    C.border_b_4,
+                    C.border_gray_5,
+                    C.focus__outline_none,
+                    C.pt_2,
+                    C.pb_2,
+                    C.px_2,
+                    C.pl_8,
+                    C.appearance_none,
+                ],
+                // ev(Ev::KeyPress, |_| Msg::ToggleGuideList),
+                attrs! {
+                    At::Type => "search",
+                    At::Placeholder => "Search",
+                    At::Value => model.search_query,
+                },
+                input_ev(Ev::Input, Msg::SearchQueryChanged),
+            ]
+        ],
+        div![nodes!(generate_skill_list(model))]
     ]
 }
