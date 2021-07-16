@@ -444,6 +444,9 @@ pub fn generate_skill_list(model: &Model) -> Vec<Node<Msg>> {
         .matched_skills
         .clone()
         .iter()
+        .filter(
+            |skill| !model.employee_skills.contains(skill)
+        )
         .map(
             |skill| {
                 let skill = skill.clone();

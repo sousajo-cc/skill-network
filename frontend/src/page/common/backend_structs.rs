@@ -1,4 +1,4 @@
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq)]
 pub struct Skill {
     pub id: i32,
     pub skill: String,
