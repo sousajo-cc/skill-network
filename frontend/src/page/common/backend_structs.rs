@@ -9,3 +9,9 @@ pub struct Employee {
     pub employee_number: String,
     pub name: String,
 }
+
+#[derive(Clone, Debug, Serialize)]
+pub struct EmployeeSkill {
+    pub employee_number: String,
+    pub skill_id: i32,
+}

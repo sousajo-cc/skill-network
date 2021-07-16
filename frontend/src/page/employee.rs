@@ -142,8 +142,20 @@ pub fn update(
         Msg::Received(skills) => {
             model.matched_skills = skills;
         },
-        Msg::AddSkill(_skill) => {
-            log!["skill added!"];
+        Msg::AddSkill(skill) => {
+            let employee_id = match &model.employee {
+                Some(employee) => employee.employee_number.clone(),
+                None => unimplemented!(),
+            };
+            let relation = EmployeeSkill {
+                employee_number: employee_id,
+                skill_id: skill.id,
+            };
+            let _request = Request::new(BACKEND_ADDRESS)
+                .method(Method::Post)
+                .header(Header::custom("Accept-Language", "en"))
+                .json(&relation)
+                .unwrap(); //TODO: remove unwrap
         },
     }
 }
