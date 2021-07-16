@@ -33,6 +33,7 @@ pub enum Msg {
     SearchQueryChanged(String),
     Received(Vec<Skill>),
     AddSkill(Skill),
+    Reload,
 }
 
 pub fn init(mut orders: impl Orders<Msg>, employee_id: &str) {
@@ -151,12 +152,35 @@ pub fn update(
                 employee_number: employee_id,
                 skill_id: skill.id,
             };
-            let _request = Request::new(BACKEND_ADDRESS)
+            let request = Request::new(BACKEND_ADDRESS)
                 .method(Method::Post)
                 .header(Header::custom("Accept-Language", "en"))
                 .json(&relation)
                 .unwrap(); //TODO: remove unwrap
+            orders.perform_cmd(async {
+                let response =
+                    fetch(request).await.expect("HTTP request failed");
+                if response.status().is_ok() {
+                    seed::log("request ok!");
+                } else {
+                    seed::log("request nok!");
+                }
+                let added = response
+                    .check_status()
+                    .expect("status check failed")
+                    .json::<usize>()
+                    .await
+                    .expect("deserialization failed");
+                if added == 1 {
+                    Msg::Reload
+                } else {
+                    Msg::Reload //TODO: no need to reload
+                }
+            });
         },
+        Msg::Reload => {
+            //TODO
+        }
     }
 }
 
