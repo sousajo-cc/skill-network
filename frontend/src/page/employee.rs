@@ -32,6 +32,7 @@ pub enum Msg {
     RequestNOK(String),
     SearchQueryChanged(String),
     Received(Vec<Skill>),
+    AddSkill(Skill),
 }
 
 pub fn init(mut orders: impl Orders<Msg>, employee_id: &str) {
@@ -140,6 +141,9 @@ pub fn update(
         },
         Msg::Received(skills) => {
             model.matched_skills = skills;
+        },
+        Msg::AddSkill(_skill) => {
+            log!["skill added!"];
         },
     }
 }
@@ -313,12 +317,30 @@ pub fn employee_found_view(model: &Model) -> Node<Msg> {
                             C.mb_6,
                             C.lg__pt_0,
                         ],
-                        div![nodes!(list_skills(model))]
+                        div![nodes!(list_skills(model))],
                     ],
-                    search_bar(model)
+                    div![
+                        normal_text(),
+                        span!["Add Skill:"],
+                        search_bar(model),
+                    ],
                 ],
             ],
         ],
+    ]
+}
+
+fn normal_text() -> Attrs {
+    C![
+        C.text_31,
+        C.flex_1,
+        C.w_full,
+        C.mx_auto,
+        C.max_w_sm,
+        C.content_start,
+        C.pt_4,
+        C.mb_6,
+        C.lg__pt_0,
     ]
 }
 
@@ -387,22 +409,19 @@ pub fn generate_skill_list(model: &Model) -> Vec<Node<Msg>> {
         .clone()
         .iter()
         .map(
-            |skill| ul![
-                C![
-                    C.text_25,
-                    C.relative, C.pl_4, C.pr_4,
-                ],
-                 button![
-                     a![
-                         attrs!{
-                            At::Href => Urls::new(&model.base_url).skill(&skill.id.to_string())
-                         },
-                        span![
-                            skill.skill.clone()
-                        ]
-                     ]
+            |skill| {
+                let skill = skill.clone();
+                ul![
+                    C![
+                        C.text_25,
+                        C.relative, C.pl_4, C.pr_4,
+                    ],
+                    button![
+                        skill.skill.clone(),
+                        ev(Ev::Click, move |_| Msg::AddSkill(skill)),
+                    ],
                 ]
-            ],
+            }
         )
         .collect()
 }
