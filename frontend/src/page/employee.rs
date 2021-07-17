@@ -108,7 +108,7 @@ pub fn update(
         },
         Msg::SearchQueryChanged(query) => {
             if query.is_empty() {
-                model.search_bar.matched_skills = Vec::<Skill>::new();
+                model.search_bar.matched_skills = Vec::new();
                 return;
             }
 

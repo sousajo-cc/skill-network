@@ -2,16 +2,14 @@ use crate::page::*;
 
 pub struct Model {
     pub base_url: Url,
-    pub search_query: String,
-    pub matched_skills: Vec<Skill>,
+    pub search_bar: SearchBar<Skill>,
 }
 
 impl Model {
     pub fn new(base_url: Url) -> Self {
         Self {
             base_url,
-            search_query: String::new(),
-            matched_skills: Vec::new(),
+            search_bar: SearchBar::new(),
         }
     }
 }
@@ -27,10 +25,8 @@ pub fn init(mut _orders: impl Orders<Msg>) {
 }
 
 pub fn generate_skill_list(model: &Model) -> Vec<Node<Msg>> {
-    seed::log("matched skills:");
-    seed::log(model.matched_skills.clone());
-
     model
+        .search_bar
         .matched_skills
         .clone()
         .iter()
@@ -59,10 +55,8 @@ pub fn update(orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
     match msg {
         Msg::SearchQueryChanged(query) => {
-            model.search_query = query.clone();
-
             if query.is_empty() {
-                model.matched_skills = Vec::<Skill>::new();
+                model.search_bar.matched_skills = Vec::<Skill>::new();
                 return;
             }
 
@@ -70,6 +64,8 @@ pub fn update(orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
             let request = Request::new(url)
                 .method(Method::Get)
                 .header(Header::custom("Accept-Language", "en"));
+
+            model.search_bar.search_query = query;
 
             orders.perform_cmd(async {
                 let response =
@@ -90,16 +86,13 @@ pub fn update(orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
             log!("search query changed 5");
         },
         Msg::Received(skills) => {
-            model.matched_skills = skills;
+            model.search_bar.matched_skills = skills;
         },
     }
 }
 
 #[allow(clippy::too_many_lines)]
 pub fn view(model: &Model) -> Node<Msg> {
-    if !model.matched_skills.is_empty() {
-        seed::log(&model.matched_skills[0].skill);
-    }
     div![
         C![C.flex_grow,],
         // Main section
@@ -222,7 +215,7 @@ fn search_bar(model: &Model) -> Node<Msg> {
                     C.bg_gray_1,
                     C.text_25,
                     C.text_25,
-                    IF!(model.search_query.is_empty() => C.font_bold),
+                    IF!(model.search_bar.search_query.is_empty() => C.font_bold),
                     C.placeholder_gray_4,
                     C.border_b_4,
                     C.border_gray_5,
@@ -237,7 +230,7 @@ fn search_bar(model: &Model) -> Node<Msg> {
                 attrs! {
                     At::Type => "search",
                     At::Placeholder => "Search",
-                    At::Value => model.search_query,
+                    At::Value => model.search_bar.search_query,
                 },
                 input_ev(Ev::Input, Msg::SearchQueryChanged),
             ]
