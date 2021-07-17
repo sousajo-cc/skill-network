@@ -84,11 +84,7 @@ fn request_employees(orders: &mut impl Orders<Msg>, id: &str) {
     });
 }
 
-pub fn update(
-    _orders: &mut impl Orders<Msg>,
-    model: &mut Model,
-    msg: Msg,
-) {
+pub fn update(_orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
     match msg {
         Msg::SkillLoaded(skill) => {

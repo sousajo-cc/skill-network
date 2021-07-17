@@ -90,11 +90,7 @@ fn request_skills(orders: &mut impl Orders<Msg>, id: &str) {
     });
 }
 
-pub fn update(
-    orders: &mut impl Orders<Msg>,
-    model: &mut Model,
-    msg: Msg,
-) {
+pub fn update(orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
     match msg {
         Msg::EmployeeLoaded(employee) => {
@@ -149,7 +145,7 @@ pub fn update(
                 .method(Method::Post)
                 .header(Header::custom("Accept-Language", "en"))
                 .json(&relation)
-                .unwrap(); //TODO: remove unwrap
+                .unwrap(); // TODO: remove unwrap
             orders.perform_cmd(async {
                 let response =
                     fetch(request).await.expect("HTTP request failed");
@@ -347,11 +343,7 @@ pub fn employee_found_view(model: &Model) -> Node<Msg> {
                         ],
                         div![nodes!(list_skills(model))],
                     ],
-                    div![
-                        normal_text(),
-                        span!["Add Skill:"],
-                        search_bar(model),
-                    ],
+                    div![normal_text(), span!["Add Skill:"], search_bar(model),],
                 ],
             ],
         ],
@@ -437,23 +429,16 @@ pub fn generate_skill_list(model: &Model) -> Vec<Node<Msg>> {
         .matched_skills
         .clone()
         .iter()
-        .filter(
-            |skill| !model.employee_skills.contains(skill)
-        )
-        .map(
-            |skill| {
-                let skill = skill.clone();
-                ul![
-                    C![
-                        C.text_25,
-                        C.relative, C.pl_4, C.pr_4,
-                    ],
-                    button![
-                        skill.skill.clone(),
-                        ev(Ev::Click, move |_| Msg::AddSkill(skill)),
-                    ],
-                ]
-            }
-        )
+        .filter(|skill| !model.employee_skills.contains(skill))
+        .map(|skill| {
+            let skill = skill.clone();
+            ul![
+                C![C.text_25, C.relative, C.pl_4, C.pr_4,],
+                button![
+                    skill.skill.clone(),
+                    ev(Ev::Click, move |_| Msg::AddSkill(skill)),
+                ],
+            ]
+        })
         .collect()
 }

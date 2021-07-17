@@ -1,3 +1,4 @@
+#[derive(Default)]
 pub struct SearchBar<T> {
     pub search_query: String,
     pub matched_skills: Vec<T>,

@@ -14,8 +14,8 @@ use seed::{prelude::*, *};
 mod generated;
 mod page;
 
-use page::*;
 use generated::css_classes::C;
+use page::*;
 
 #[macro_use]
 extern crate serde_derive;
@@ -39,11 +39,16 @@ fn init(url: Url, orders: &mut impl Orders<Msg>) -> Model {
     match &model.page_model {
         PageModel::Home(_) => page::home::init(orders.proxy(Msg::Home)),
         PageModel::About(_) => page::about::init(orders.proxy(Msg::About)),
-        PageModel::Skill(inner_model) =>
-            page::skill::init(orders.proxy(Msg::Skill), &inner_model.skill_id),
-        PageModel::Employee(inner_model) =>
-            page::employee::init(orders.proxy(Msg::Employee), &inner_model.employee_id),
-        PageModel::NotFound(_) => page::not_found::init(orders.proxy(Msg::NotFound)),
+        PageModel::Skill(inner_model) => {
+            page::skill::init(orders.proxy(Msg::Skill), &inner_model.skill_id)
+        },
+        PageModel::Employee(inner_model) => page::employee::init(
+            orders.proxy(Msg::Employee),
+            &inner_model.employee_id,
+        ),
+        PageModel::NotFound(_) => {
+            page::not_found::init(orders.proxy(Msg::NotFound))
+        },
     }
     page::partial::header::init(orders.proxy(Msg::Header));
     page::partial::footer::init(orders.proxy(Msg::Footer));
@@ -90,13 +95,11 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
                 inner_msg,
             );
         },
-        Msg::Footer(inner_msg) => {
-            page::partial::footer::update(
-                &mut orders.proxy(Msg::Footer),
-                &mut model.footer_model,
-                inner_msg,
-            )
-        },
+        Msg::Footer(inner_msg) => page::partial::footer::update(
+            &mut orders.proxy(Msg::Footer),
+            &mut model.footer_model,
+            inner_msg,
+        ),
         Msg::About(_) => unimplemented!(),
         Msg::NotFound(_) => unimplemented!(),
     }
@@ -111,12 +114,16 @@ pub fn view(model: &Model) -> impl IntoNodes<Msg> {
             C.flex_col,
         ],
         match &model.page_model {
-            PageModel::Home(inner_model) => page::home::view(inner_model).map_msg(Msg::Home),
-            PageModel::About(inner_model) => page::about::view(inner_model).map_msg(Msg::About),
-            PageModel::Skill(inner_model) => page::skill::view(inner_model).map_msg(Msg::Skill),
+            PageModel::Home(inner_model) =>
+                page::home::view(inner_model).map_msg(Msg::Home),
+            PageModel::About(inner_model) =>
+                page::about::view(inner_model).map_msg(Msg::About),
+            PageModel::Skill(inner_model) =>
+                page::skill::view(inner_model).map_msg(Msg::Skill),
             PageModel::Employee(inner_model) =>
                 page::employee::view(inner_model).map_msg(Msg::Employee),
-            PageModel::NotFound(inner_model) => page::not_found::view(inner_model).map_msg(Msg::NotFound),
+            PageModel::NotFound(inner_model) =>
+                page::not_found::view(inner_model).map_msg(Msg::NotFound),
         },
         page::partial::header::view(&model.header_model).map_msg(Msg::Header),
         page::partial::footer::view(&model.footer_model).map_msg(Msg::Footer),
