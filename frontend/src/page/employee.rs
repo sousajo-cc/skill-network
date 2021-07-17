@@ -33,7 +33,7 @@ pub enum Msg {
     SearchQueryChanged(String),
     Received(Vec<Skill>),
     AddSkill(Skill),
-    Reload,
+    SkillAdded(usize),
 }
 
 pub fn init(mut orders: impl Orders<Msg>, employee_id: &str) {
@@ -144,12 +144,8 @@ pub fn update(
             model.matched_skills = skills;
         },
         Msg::AddSkill(skill) => {
-            let employee_id = match &model.employee {
-                Some(employee) => employee.employee_number.clone(),
-                None => unimplemented!(),
-            };
             let relation = EmployeeSkill {
-                employee_number: employee_id,
+                employee_number: model.employee_id.clone(),
                 skill_id: skill.id,
             };
             let request = Request::new(BACKEND_ADDRESS)
@@ -171,15 +167,14 @@ pub fn update(
                     .json::<usize>()
                     .await
                     .expect("deserialization failed");
-                if added == 1 {
-                    Msg::Reload
-                } else {
-                    Msg::Reload //TODO: no need to reload
-                }
+                Msg::SkillAdded(added)
             });
         },
-        Msg::Reload => {
-            //TODO
+        Msg::SkillAdded(added) => {
+            if added > 0 {
+                model.search_query = String::new();
+                request_skills(orders, &model.employee_id);
+            }
         }
     }
 }
