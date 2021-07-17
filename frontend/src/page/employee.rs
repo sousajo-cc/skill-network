@@ -6,9 +6,7 @@ pub struct Model {
     pub employee: Option<Employee>,
     pub employee_skills: Vec<Skill>,
     pub error: Option<String>,
-    //TODO: these two below are duplicated (see home::Model)
-    pub search_query: String,
-    pub matched_skills: Vec<Skill>,
+    pub search_bar: SearchBar<Skill>,
 }
 
 impl Model {
@@ -19,8 +17,7 @@ impl Model {
             employee: None,
             employee_skills: Vec::new(),
             error: None,
-            search_query: String::new(),
-            matched_skills: Vec::new(),
+            search_bar: SearchBar::new(),
         }
     }
 }
@@ -110,10 +107,8 @@ pub fn update(
             model.error = Some(err_msg);
         },
         Msg::SearchQueryChanged(query) => {
-            model.search_query = query.clone();
-
             if query.is_empty() {
-                model.matched_skills = Vec::<Skill>::new();
+                model.search_bar.matched_skills = Vec::<Skill>::new();
                 return;
             }
 
@@ -121,6 +116,8 @@ pub fn update(
             let request = Request::new(url)
                 .method(Method::Get)
                 .header(Header::custom("Accept-Language", "en"));
+
+            model.search_bar.search_query = query;
 
             orders.perform_cmd(async {
                 let response =
@@ -141,7 +138,7 @@ pub fn update(
             log!("search query changed 5");
         },
         Msg::Received(skills) => {
-            model.matched_skills = skills;
+            model.search_bar.matched_skills = skills;
         },
         Msg::AddSkill(skill) => {
             let relation = EmployeeSkill {
@@ -172,10 +169,10 @@ pub fn update(
         },
         Msg::SkillAdded(added) => {
             if added > 0 {
-                model.search_query = String::new();
+                model.search_bar = SearchBar::new();
                 request_skills(orders, &model.employee_id);
             }
-        }
+        },
     }
 }
 
@@ -407,7 +404,7 @@ fn search_bar(model: &Model) -> Node<Msg> {
                     C.bg_gray_1,
                     C.text_25,
                     C.text_25,
-                    IF!(model.search_query.is_empty() => C.font_bold),
+                    IF!(model.search_bar.search_query.is_empty() => C.font_bold),
                     C.placeholder_gray_4,
                     C.border_b_4,
                     C.border_gray_5,
@@ -422,7 +419,7 @@ fn search_bar(model: &Model) -> Node<Msg> {
                 attrs! {
                     At::Type => "search",
                     At::Placeholder => "Search",
-                    At::Value => model.search_query,
+                    At::Value => model.search_bar.search_query,
                 },
                 input_ev(Ev::Input, Msg::SearchQueryChanged),
             ]
@@ -433,9 +430,10 @@ fn search_bar(model: &Model) -> Node<Msg> {
 
 pub fn generate_skill_list(model: &Model) -> Vec<Node<Msg>> {
     seed::log("matched skills:");
-    seed::log(model.matched_skills.clone());
+    seed::log(model.search_bar.matched_skills.clone());
 
     model
+        .search_bar
         .matched_skills
         .clone()
         .iter()
