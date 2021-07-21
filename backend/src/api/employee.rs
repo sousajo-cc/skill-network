@@ -22,10 +22,7 @@ fn get_by_employeenumber(
 }
 
 #[get("/search/<name>")]
-fn search_by_name(
-    name: String,
-    connection: DbConn,
-) -> Result<Json<Vec<Employee>>, BackendError> {
+fn search_by_name(name: String, connection: DbConn) -> Result<Json<Vec<Employee>>, BackendError> {
     // try this with http://localhost:8000/employee/get_by_name/Jorge
     let employee_by_name = Employee::filter(&connection, &name)?;
     Ok(Json(employee_by_name))

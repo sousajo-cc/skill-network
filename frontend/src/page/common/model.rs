@@ -35,7 +35,9 @@ impl PageModel {
         match page {
             Page::Home => Self::Home(home::Model::new(base_url)),
             Page::Skill(id) => Self::Skill(skill::Model::new(base_url, id)),
-            Page::Employee(id) => Self::Employee(employee::Model::new(base_url, id)),
+            Page::Employee(id) => {
+                Self::Employee(employee::Model::new(base_url, id))
+            },
             Page::About => Self::About(about::Model),
             Page::NotFound => Self::NotFound(not_found::Model),
         }

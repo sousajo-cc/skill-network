@@ -6,6 +6,7 @@ pub struct Model {
     pub employee: Option<Employee>,
     pub employee_skills: Vec<Skill>,
     pub error: Option<String>,
+    pub search_bar: SearchBar<Skill>,
 }
 
 impl Model {
@@ -16,6 +17,7 @@ impl Model {
             employee: None,
             employee_skills: Vec::new(),
             error: None,
+            search_bar: SearchBar::new(),
         }
     }
 }
@@ -25,6 +27,10 @@ pub enum Msg {
     EmployeeLoaded(Employee),
     SkillListLoaded(Vec<Skill>),
     RequestNOK(String),
+    SearchQueryChanged(String),
+    Received(Vec<Skill>),
+    AddSkill(Skill),
+    SkillAdded(usize),
 }
 
 pub fn init(mut orders: impl Orders<Msg>, employee_id: &str) {
@@ -84,11 +90,7 @@ fn request_skills(orders: &mut impl Orders<Msg>, id: &str) {
     });
 }
 
-pub fn update(
-    _orders: &mut impl Orders<Msg>,
-    model: &mut Model,
-    msg: Msg,
-) {
+pub fn update(orders: &mut impl Orders<Msg>, model: &mut Model, msg: Msg) {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
     match msg {
         Msg::EmployeeLoaded(employee) => {
@@ -99,6 +101,73 @@ pub fn update(
         },
         Msg::RequestNOK(err_msg) => {
             model.error = Some(err_msg);
+        },
+        Msg::SearchQueryChanged(query) => {
+            if query.is_empty() {
+                model.search_bar.matched_skills = Vec::new();
+                return;
+            }
+
+            let url = format!("{}/skill/search/{}", BACKEND_ADDRESS, query);
+            let request = Request::new(url)
+                .method(Method::Get)
+                .header(Header::custom("Accept-Language", "en"));
+
+            model.search_bar.search_query = query;
+
+            orders.perform_cmd(async {
+                let response =
+                    fetch(request).await.expect("HTTP request failed");
+                if response.status().is_ok() {
+                    seed::log("request ok!");
+                } else {
+                    seed::log("request nok!");
+                }
+                let skill_list = response
+                    .check_status()
+                    .expect("status check failed")
+                    .json::<Vec<Skill>>()
+                    .await
+                    .expect("deserialization failed");
+                Msg::Received(skill_list)
+            });
+            log!("search query changed 5");
+        },
+        Msg::Received(skills) => {
+            model.search_bar.matched_skills = skills;
+        },
+        Msg::AddSkill(skill) => {
+            let relation = EmployeeSkill {
+                employee_number: model.employee_id.clone(),
+                skill_id: skill.id,
+            };
+            let request = Request::new(BACKEND_ADDRESS)
+                .method(Method::Post)
+                .header(Header::custom("Accept-Language", "en"))
+                .json(&relation)
+                .unwrap(); // TODO: remove unwrap
+            orders.perform_cmd(async {
+                let response =
+                    fetch(request).await.expect("HTTP request failed");
+                if response.status().is_ok() {
+                    seed::log("request ok!");
+                } else {
+                    seed::log("request nok!");
+                }
+                let added = response
+                    .check_status()
+                    .expect("status check failed")
+                    .json::<usize>()
+                    .await
+                    .expect("deserialization failed");
+                Msg::SkillAdded(added)
+            });
+        },
+        Msg::SkillAdded(added) => {
+            if added > 0 {
+                model.search_bar = SearchBar::new();
+                request_skills(orders, &model.employee_id);
+            }
         },
     }
 }
@@ -272,10 +341,104 @@ pub fn employee_found_view(model: &Model) -> Node<Msg> {
                             C.mb_6,
                             C.lg__pt_0,
                         ],
-                        div![nodes!(list_skills(model))]
-                    ]
+                        div![nodes!(list_skills(model))],
+                    ],
+                    div![normal_text(), span!["Add Skill:"], search_bar(model),],
                 ],
             ],
         ],
     ]
+}
+
+fn normal_text() -> Attrs {
+    C![
+        C.text_31,
+        C.flex_1,
+        C.w_full,
+        C.mx_auto,
+        C.max_w_sm,
+        C.content_start,
+        C.pt_4,
+        C.mb_6,
+        C.lg__pt_0,
+    ]
+}
+
+fn search_bar(model: &Model) -> Node<Msg> {
+    div![
+        C![
+            C.flex_1,
+            C.w_full,
+            C.mx_auto,
+            C.max_w_sm,
+            C.content_center,
+            C.pt_4,
+            C.mb_6,
+            // lg__
+            C.lg__pt_0,
+        ],
+        div![
+            C![
+                C.relative, C.pl_4, C.pr_4, // md__
+                C.md__pr_0,
+            ],
+            // search icon
+            div![
+                C![C.absolute,],
+                style! {
+                    St::Top => rem(0.6),
+                    St::Left => rem(1.5),
+                },
+            ],
+            input![
+                C![
+                    C.w_full,
+                    C.bg_gray_1,
+                    C.text_25,
+                    C.text_25,
+                    IF!(model.search_bar.search_query.is_empty() => C.font_bold),
+                    C.placeholder_gray_4,
+                    C.border_b_4,
+                    C.border_gray_5,
+                    C.focus__outline_none,
+                    C.pt_2,
+                    C.pb_2,
+                    C.px_2,
+                    C.pl_8,
+                    C.appearance_none,
+                ],
+                // ev(Ev::KeyPress, |_| Msg::ToggleGuideList),
+                attrs! {
+                    At::Type => "search",
+                    At::Placeholder => "Search",
+                    At::Value => model.search_bar.search_query,
+                },
+                input_ev(Ev::Input, Msg::SearchQueryChanged),
+            ]
+        ],
+        div![nodes!(generate_skill_list(model))]
+    ]
+}
+
+pub fn generate_skill_list(model: &Model) -> Vec<Node<Msg>> {
+    seed::log("matched skills:");
+    seed::log(model.search_bar.matched_skills.clone());
+
+    model
+        .search_bar
+        .matched_skills
+        .clone()
+        .iter()
+        .filter(|skill| !model.employee_skills.contains(skill))
+        .map(|skill| {
+            let skill = skill.clone();
+            ul![
+                C![C.text_25, C.relative, C.pl_4, C.pr_4,],
+                button![
+                    skill.skill.clone(),
+                    ev(Ev::Click, move |_| Msg::AddSkill(skill)),
+                ],
+            ]
+        })
+        .collect()
 }

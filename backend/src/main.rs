@@ -125,15 +125,14 @@ pub fn example() -> Result<(), BackendError> {
 pub fn main() -> Result<(), Error> {
     use api::*;
 
-    let allowed_origins = AllowedOrigins::all();
-
     let cors = rocket_cors::CorsOptions {
-        allowed_origins,
-        allowed_headers: AllowedHeaders::some(&["Authorization", "Accept"]),
+        allowed_origins: AllowedOrigins::all(),
+        allowed_headers: AllowedHeaders::some(&["Authorization", "Accept", "Content-type"]),
         allow_credentials: true,
         ..Default::default()
     }
     .to_cors()?;
+
     example()
         .or_else(|e| {
             if let BackendError::DatabaseError(_) = e {
