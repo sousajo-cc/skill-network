@@ -11,8 +11,13 @@ Install docker
 ### Build and Run
 
 ```
-sudo docker-compose up
+docker-compose up
 ```
+or
+```
+docker compose up
+```
+Depending on your setup
 
 After a while, the application will be available on localhost:8080
 
